@@ -1,0 +1,24 @@
+
+package com.tongtech.client.enums;
+/**
+ * 客户端-代理应答报文 1501~2000【CB是工作节点】
+ *
+ * @author 杨平
+ * @date 2020/6/23
+ */
+public interface CB_RESPONSE {
+    public static final int CB_RSP_REGISTER_CLIENT = 1501,
+    CB_RSP_UNREGISTER_CLIENT = 1502,
+    CB_RSP_REGISTER_PRODUCER = 1503,
+    CB_RSP_UNREGISTER_PRODUCER = 1504,
+    CB_RSP_REGISTER_CONSUMER = 1505,
+    CB_RSP_UNREGISTER_CONSUMER = 1506,
+    CB_RSP_SEND_MESSAGE_ACK = 1507,
+    CB_RSP_PULL_MESSAGE = 1508,
+    CB_RSP_HEARTBEAT = 1509,
+    CB_RSP_BATCH_PUSH_MSG_ACK  = 1510,
+    CB_CREATE_FILE_ACK  = 1520,
+    CB_UPDATE_FILE_ACK  = 1530,
+            CB_RSP_DOWNLOAD_ACK=1550,
+    CB_RSP_PULL_MESSAGE_FILE  = 1540;
+}
