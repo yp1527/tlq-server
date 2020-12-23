@@ -173,10 +173,10 @@ public class MessageEncoderUtils {
             case CB_REQUEST.CB_REQ_PULL_MESSAGE://客户端拉取消息响应
                 ClientMessageData.CBClientConsumerPullMsg pullMsg=(ClientMessageData.CBClientConsumerPullMsg)remotingRequest.getMessage();
                 int status=1;
-                if(status==0){
+                if(status==1){
                     //文件响应
-                    common.setCommandType(CB_RESPONSE.CB_RSP_PULL_MESSAGE_FILE);
-                    remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_PULL_MESSAGE_FILE);
+                    common.setCommandType(CB_RESPONSE.CB_RSP_CONSUME_FILE);
+                    remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_CONSUME_FILE);
                     File file=new File("D:/netty/receive/service/kk.mp4");
                     ClientMessageData.CBConsumerFileResponse.Builder cbBrokerPushMsg = ClientMessageData.CBConsumerFileResponse.newBuilder();
                     cbBrokerPushMsg.setCommonHeader(common);
@@ -376,6 +376,7 @@ public class MessageEncoderUtils {
 
                 ClientMessageData.TopicBrokerInfo.Builder topicInfo = ClientMessageData.TopicBrokerInfo.newBuilder();
                 topicInfo.setIpaddr(IpUtils.IpToInt("127.0.0.1"));
+                //topicInfo.setIpaddr(IpUtils.IpToInt("192.168.56.1"));
                 //topicInfo.setIpaddr6("0:0:0:0:0:0:0:1");
                 topicInfo.setPort(9999);
                 topicInfo.setTopicName(routeRequest.getTopicName());
@@ -469,10 +470,10 @@ public class MessageEncoderUtils {
                 length=rollbackResponse.toByteArray().length;
                 body=rollbackResponse.toByteArray();
                 break;
-            case CB_FILE_REQUEST.FILE_CREATE://文件传输创建请求
+            case CB_REQUEST.CB_REQ_SEND_FILE://文件传输创建请求
                 ClientMessageData.SendFileRequest sendFileRequest =(ClientMessageData.SendFileRequest)remotingRequest.getMessage();
-                common.setCommandType(CB_RESPONSE.CB_CREATE_FILE_ACK);
-                remotingCommand.setCommandType(CB_RESPONSE.CB_CREATE_FILE_ACK);
+                common.setCommandType(CB_RESPONSE.CB_RSP_SEND_FILE);
+                remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_SEND_FILE);
                 ClientMessageData.SendFileResponse.Builder response = ClientMessageData.SendFileResponse.newBuilder();
                 ConcurrentMap<String,FileMsg>map=null;
                 FileMsg fileMsg1=null;
@@ -562,10 +563,10 @@ public class MessageEncoderUtils {
                 length=fileResponse.toByteArray().length;
                 body=fileResponse.toByteArray();
                 break;
-            case CB_FILE_REQUEST.FILE_UPLOAD://文件传输请求
+            case CB_REQUEST.CB_REQ_FILE_MESSAGE://文件传输请求
                 ClientMessageData.MessageFile messageFile =(ClientMessageData.MessageFile)remotingRequest.getMessage();
-                common.setCommandType(CB_RESPONSE.CB_UPDATE_FILE_ACK);
-                remotingCommand.setCommandType(CB_RESPONSE.CB_UPDATE_FILE_ACK);
+                common.setCommandType(CB_RESPONSE.CB_RSP_FILE_MESSAGE_ACK);
+                remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_FILE_MESSAGE_ACK);
                 ClientMessageData.MessageFileAck.Builder fileAck = ClientMessageData.MessageFileAck.newBuilder();
                 if(fileMap.containsKey(messageFile.getMsgID())){
                     ConcurrentMap<String,FileMsg> data=fileMap.get(messageFile.getMsgID());
@@ -611,10 +612,10 @@ public class MessageEncoderUtils {
                 }
                 break;
 
-            case CB_FILE_REQUEST.FILE_DOWNLOAD://下载请求
+            case CB_REQUEST.CB_REQ_DOWNLOAD_FILE://下载请求
                 ClientMessageData.CBDownloadRequest downloadRequest =(ClientMessageData.CBDownloadRequest)remotingRequest.getMessage();
-                common.setCommandType(CB_RESPONSE.CB_RSP_DOWNLOAD_ACK);
-                remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_DOWNLOAD_ACK);
+                common.setCommandType(CB_RESPONSE.CB_RSP_DOWNLOAD_FILE);
+                remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_DOWNLOAD_FILE);
 
                 ClientMessageData.CBDownloadResponse.Builder donwnload = ClientMessageData.CBDownloadResponse.newBuilder();
                 donwnload.setCommonHeader(common);

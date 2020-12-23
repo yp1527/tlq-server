@@ -1,7 +1,6 @@
 package com.tongtech.client.netty;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.tongtech.client.enums.CB_FILE_REQUEST;
 import com.tongtech.client.enums.CB_REQUEST;
 import com.tongtech.client.enums.CN_REQUEST;
 import com.tongtech.client.protobuf.ClientMessageData;
@@ -113,7 +112,7 @@ public class MessageDecoderUtils {
                     //System.out.println("收到与管理节点回溯消息请求:" + rollbackByTime);
                     break;
 
-                case CB_FILE_REQUEST.FILE_CREATE://传输文件创建请求
+                case CB_REQUEST.CB_REQ_SEND_FILE://传输文件创建请求
                     ClientMessageData.SendFileRequest sendFileRequest = ClientMessageData.SendFileRequest.parseFrom(body);
                     object=sendFileRequest;
                     requestId=sendFileRequest.getCommonHeader().getRequestId();
@@ -121,13 +120,13 @@ public class MessageDecoderUtils {
                     //System.out.println("收到传输文件创建请求:" + sendFileRequest.getFilePath());
                     break;
 
-                case CB_FILE_REQUEST.FILE_UPLOAD://传输文件
+                case CB_REQUEST.CB_REQ_FILE_MESSAGE://传输文件
                     ClientMessageData.MessageFile messageFile = ClientMessageData.MessageFile.parseFrom(body);
                     object=messageFile;
                     requestId=messageFile.getCommonHeader().getRequestId();
                     //System.out.println("收到传输文件beginFileOffset:" + messageFile.getBeginFileOffset()+",endFileOffset:"+messageFile.getEndFileOffset());
                     break;
-                case CB_FILE_REQUEST.FILE_DOWNLOAD://下载请求
+                case CB_REQUEST.CB_REQ_DOWNLOAD_FILE://下载请求
                     ClientMessageData.CBDownloadRequest downloadRequest = ClientMessageData.CBDownloadRequest.parseFrom(body);
                     object=downloadRequest;
                     requestId=downloadRequest.getCommonHeader().getRequestId();

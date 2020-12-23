@@ -40,7 +40,8 @@ public class UdpHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         RemotingCommand command=MessageEncoderUtils.MessageEncoderToRemotingCommand(commonMessage,message);
 
 
-        ByteBuf out = Unpooled.buffer(2048);
+        System.out.println("length:"+command.getBody().length);
+        ByteBuf out = Unpooled.buffer(8+command.getBody().length);
         out.writeShort(command.getVerNo());
         out.writeShort(command.getCommandType());
         out.writeInt(command.getLength());

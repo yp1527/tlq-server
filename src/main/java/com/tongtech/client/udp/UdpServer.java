@@ -1,10 +1,7 @@
 package com.tongtech.client.udp;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 
@@ -41,6 +38,10 @@ public class UdpServer {
         bootstrap.group(acceptGroup)
                 .channel(NioDatagramChannel.class)
                 .option(ChannelOption.SO_BROADCAST, true)
+                .option(ChannelOption.SO_SNDBUF, 65535)
+                .option(ChannelOption.SO_RCVBUF, 65535)
+                // 默认netty udp接收DatagramPacket字节数最大是2048，如果数据大，超过这个限制，就会报错，抛出异常
+                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535))
                 .handler(new ChannelInitializer<NioDatagramChannel>() {
                     @Override
                     protected void initChannel(NioDatagramChannel ch)
