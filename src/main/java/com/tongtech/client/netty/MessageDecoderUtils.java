@@ -31,7 +31,7 @@ public class MessageDecoderUtils {
                     ClientMessageData.CBClientConsumerAck clientConsumerAck = ClientMessageData.CBClientConsumerAck.parseFrom(body);
                     object=clientConsumerAck;
                     requestId=clientConsumerAck.getCommonHeader().getRequestId();
-                    //System.out.println("收到consumer消费消息确认请求:" + clientConsumerAck);
+                    System.out.println("收到consumer消费消息确认请求:" + clientConsumerAck);
                     break;
                 case CN_REQUEST.CN_REQ_HEARTBEAT://客户端名字服务心跳请求
                 case CB_REQUEST.CB_REQ_HEARTBEAT://客户端代理服务心跳请求
@@ -113,7 +113,7 @@ public class MessageDecoderUtils {
                     break;
 
                 case CB_REQUEST.CB_REQ_SEND_FILE://传输文件创建请求
-                    ClientMessageData.SendFileRequest sendFileRequest = ClientMessageData.SendFileRequest.parseFrom(body);
+                    ClientMessageData.CBSendFileRequest sendFileRequest = ClientMessageData.CBSendFileRequest.parseFrom(body);
                     object=sendFileRequest;
                     requestId=sendFileRequest.getCommonHeader().getRequestId();
                     //System.out.println("收到传输文件创建请求:" + sendFileRequest.getFilePath());

@@ -8,6 +8,7 @@ import com.tongtech.client.protobuf.CommonHeader;
 import com.tongtech.client.protobuf.RemotingCommand;
 import com.tongtech.client.utils.FileUtils;
 import com.tongtech.client.utils.IpUtils;
+import com.tongtech.client.utils.Validators;
 import io.netty.util.ReferenceCountUtil;
 
 import java.io.*;
@@ -172,13 +173,13 @@ public class MessageEncoderUtils {
                 break;
             case CB_REQUEST.CB_REQ_PULL_MESSAGE://客户端拉取消息响应
                 ClientMessageData.CBClientConsumerPullMsg pullMsg=(ClientMessageData.CBClientConsumerPullMsg)remotingRequest.getMessage();
-                int status=1;
+                int status=0;
                 if(status==1){
                     //文件响应
                     common.setCommandType(CB_RESPONSE.CB_RSP_CONSUME_FILE);
                     remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_CONSUME_FILE);
                     File file=new File("D:/netty/receive/service/kk.mp4");
-                    ClientMessageData.CBConsumerFileResponse.Builder cbBrokerPushMsg = ClientMessageData.CBConsumerFileResponse.newBuilder();
+                    ClientMessageData.CBConsumeFileResponse.Builder cbBrokerPushMsg = ClientMessageData.CBConsumeFileResponse.newBuilder();
                     cbBrokerPushMsg.setCommonHeader(common);
                     byte []data=null;
                     if(file.length()>fileSize){
@@ -191,12 +192,12 @@ public class MessageEncoderUtils {
                     cbBrokerPushMsg.setMsgID(hash);
                     cbBrokerPushMsg.setHash(hash);
                     cbBrokerPushMsg.setRealFileSize(file.length());
-                    cbBrokerPushMsg.setSourceSize(file.length());
-                    cbBrokerPushMsg.setFilename(file.getName());
+                    cbBrokerPushMsg.setOriginalSize(file.length());
+                    cbBrokerPushMsg.setFileName(file.getName());
                     cbBrokerPushMsg.setStatusCode(0);
                     cbBrokerPushMsg.setFileID(9999999999999l);
 
-                    ClientMessageData.CBConsumerFileResponse pushMsg=cbBrokerPushMsg.build();
+                    ClientMessageData.CBConsumeFileResponse pushMsg=cbBrokerPushMsg.build();
                     length=pushMsg.toByteArray().length;
                     body=pushMsg.toByteArray();
                 }else {
@@ -379,7 +380,12 @@ public class MessageEncoderUtils {
                 //topicInfo.setIpaddr(IpUtils.IpToInt("192.168.56.1"));
                 //topicInfo.setIpaddr6("0:0:0:0:0:0:0:1");
                 topicInfo.setPort(9999);
-                topicInfo.setTopicName(routeRequest.getTopicName());
+                if(!Validators.isEmpty(routeRequest.getTopicName())){
+                    topicInfo.setTopicName(routeRequest.getTopicName());
+                }
+                if(!Validators.isEmpty(routeRequest.getQueueName())){
+                    topicInfo.setQueueName(routeRequest.getQueueName());
+                }
                 topicInfo.setState(1);
                 topicInfo.setProducerId(routeRequest.getProducerId());
                 producerId=routeRequest.getProducerId();
@@ -471,10 +477,10 @@ public class MessageEncoderUtils {
                 body=rollbackResponse.toByteArray();
                 break;
             case CB_REQUEST.CB_REQ_SEND_FILE://文件传输创建请求
-                ClientMessageData.SendFileRequest sendFileRequest =(ClientMessageData.SendFileRequest)remotingRequest.getMessage();
+                ClientMessageData.CBSendFileRequest sendFileRequest =(ClientMessageData.CBSendFileRequest)remotingRequest.getMessage();
                 common.setCommandType(CB_RESPONSE.CB_RSP_SEND_FILE);
                 remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_SEND_FILE);
-                ClientMessageData.SendFileResponse.Builder response = ClientMessageData.SendFileResponse.newBuilder();
+                ClientMessageData.CBSendFileResponse.Builder response = ClientMessageData.CBSendFileResponse.newBuilder();
                 ConcurrentMap<String,FileMsg>map=null;
                 FileMsg fileMsg1=null;
                 //<msgId,<fileId,FileMsg>>
@@ -491,8 +497,8 @@ public class MessageEncoderUtils {
                         fileMsg1.setFileHash(sendFileRequest.getFileHash());
                         fileMsg1.setFileName(fileName);
                         fileMsg1.setRealFileSize(sendFileRequest.getRealFileSize());
-                        fileMsg1.setSourceSize(sendFileRequest.getSourceSize());
-                        fileMsg1.setBreakFlag(sendFileRequest.getBreakFlag());
+                        fileMsg1.setSourceSize(sendFileRequest.getOriginalSize());
+                        fileMsg1.setBreakFlag(sendFileRequest.getBreakPointTrans());
                         fileMsg1.setFilePath(sendFileRequest.getFilePath());
                         fileMsg1.setStartPosition(sendFileRequest.getStartPosition());
                         fileMsg1.setEndPosition(sendFileRequest.getEndPosition());
@@ -500,7 +506,7 @@ public class MessageEncoderUtils {
                         fileMsg1.setIndex(sendFileRequest.getIndex());
                         FileChannel channel=(FileChannel.open(createFile.toPath(),
                                 StandardOpenOption.WRITE, StandardOpenOption.APPEND));
-                        if(sendFileRequest.getBreakFlag()==0){
+                        if(sendFileRequest.getBreakPointTrans()==0){
                             ByteBuffer wrap = ByteBuffer.wrap(sendFileRequest.getData().toByteArray());
                             try {
                                 int size=channel.write(wrap);
@@ -525,8 +531,8 @@ public class MessageEncoderUtils {
                     fileMsg1.setFileHash(sendFileRequest.getFileHash());
                     fileMsg1.setFileName(fileName);
                     fileMsg1.setRealFileSize(sendFileRequest.getRealFileSize());
-                    fileMsg1.setSourceSize(sendFileRequest.getSourceSize());
-                    fileMsg1.setBreakFlag(sendFileRequest.getBreakFlag());
+                    fileMsg1.setSourceSize(sendFileRequest.getOriginalSize());
+                    fileMsg1.setBreakFlag(sendFileRequest.getBreakPointTrans());
                     fileMsg1.setFilePath(sendFileRequest.getFilePath());
                     fileMsg1.setStartPosition(sendFileRequest.getStartPosition());
                     fileMsg1.setEndPosition(sendFileRequest.getEndPosition());
@@ -535,7 +541,7 @@ public class MessageEncoderUtils {
                     FileChannel fileChannel=(FileChannel.open(createFile.toPath(),
                             StandardOpenOption.WRITE, StandardOpenOption.APPEND));
 
-                    if(sendFileRequest.getBreakFlag()==0){
+                    if(sendFileRequest.getBreakPointTrans()==0){
                         ByteBuffer wrap = ByteBuffer.wrap(sendFileRequest.getData().toByteArray());
                         try {
                             int size=fileChannel.write(wrap);
@@ -559,7 +565,7 @@ public class MessageEncoderUtils {
                 response.setFileID(Long.parseLong(sendFileRequest.getSplitFileHash()));
                 response.setStatusCode(0);
 
-                ClientMessageData.SendFileResponse fileResponse=response.build();
+                ClientMessageData.CBSendFileResponse fileResponse=response.build();
                 length=fileResponse.toByteArray().length;
                 body=fileResponse.toByteArray();
                 break;
