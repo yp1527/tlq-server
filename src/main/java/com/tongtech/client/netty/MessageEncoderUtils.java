@@ -55,7 +55,7 @@ public class MessageEncoderUtils {
     public static List<ClientMessageData.MessageBuffer>messageBufferList=new ArrayList<>();
     static {
         for(int i=0;i<11000;i++){
-            ClientMessageData.MessageBuffer messageBuffer=getMessageBuffer("topic1");
+            ClientMessageData.MessageBuffer messageBuffer=getMessageBuffer("topic1",i);
             messageBufferList.add(messageBuffer);
         }
         /*ConcurrentHashMap<String,FileMsg> pp=new ConcurrentHashMap<>();
@@ -226,7 +226,7 @@ public class MessageEncoderUtils {
                             messageSize=11000;
                             if(flag){
                                 for(int i=0;i<10;i++){
-                                    ClientMessageData.MessageBuffer messageBuffer=getMessageBuffer("topic1");
+                                    ClientMessageData.MessageBuffer messageBuffer=getMessageBuffer("topic1",i);
                                     messageBufferList.add(messageBuffer);
                                 }
                             }
@@ -671,9 +671,9 @@ public class MessageEncoderUtils {
         return arr;
     }
 
-    public static ClientMessageData.MessageBuffer getMessageBuffer(String topic){
+    public static ClientMessageData.MessageBuffer getMessageBuffer(String topic,int i){
         ClientMessageData.MessageBuffer.Builder buffer=ClientMessageData.MessageBuffer.newBuilder();
-        buffer.setData(ByteString.copyFrom(("hello world-"+sum).getBytes()));
+        buffer.setData(ByteString.copyFrom(("hello world-"+i).getBytes()));
         Map<String,Object>map=new HashMap<>();
         map.put("key","yangping");
         ClientMessageData.MessageAttr.Builder attr=ClientMessageData.MessageAttr.newBuilder();
