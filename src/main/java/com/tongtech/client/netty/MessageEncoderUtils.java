@@ -699,6 +699,14 @@ public class MessageEncoderUtils {
         return buffer.build();
     }
 
+    public static String buildMessage(final int messageSize)  {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < messageSize; i ++) {
+            sb.append("a");
+        }
+        return sb.toString();
+    }
+
     public static byte[] mapToBytes(Map<String, Object> map) {
         byte[] bytes = null;
         ByteArrayOutputStream byteArrayOutputStream=null;
