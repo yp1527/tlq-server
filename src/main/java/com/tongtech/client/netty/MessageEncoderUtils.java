@@ -213,12 +213,14 @@ public class MessageEncoderUtils {
 
                     cbBrokerPushMsg.setStatusCode(0);
                     if(pullMsg.getConsumeQueOffset()==-1){
-                        cbBrokerPushMsg.setMinConsumeQueueOffset(95);
-                        cbBrokerPushMsg.setMaxConsumeQueueOffset(100);
-                        //拉取最新消息
-                        for(int m=95;m<=100;m++){
-                            ClientMessageData.MessageBuffer messageBuffer=messageBufferList.get(m-1);
-                            cbBrokerPushMsg.addMessages(messageBuffer);
+                        if(sum<=5){
+                            cbBrokerPushMsg.setMinConsumeQueueOffset(95);
+                            cbBrokerPushMsg.setMaxConsumeQueueOffset(100);
+                            //拉取最新消息
+                            for(int m=95;m<=100;m++){
+                                ClientMessageData.MessageBuffer messageBuffer=messageBufferList.get(m-1);
+                                cbBrokerPushMsg.addMessages(messageBuffer);
+                            }
                         }
                     }else if(pullMsg.getConsumeQueOffset()>=0){
                         long end=0;
@@ -687,13 +689,13 @@ public class MessageEncoderUtils {
         header.setTopicName(topic);
         header.setMsgID(UUID.randomUUID().toString());
         header.setQueueID(0);
-        header.setExpiry(200);
+        header.setExpiry(-1);
         header.setPersistence(1);
-        header.setCluster("cluster");
+        header.setCluster("");
         header.setDomain("");
         header.setCommitLogOffset(requestId.getAndIncrement());
         header.setBrokerId(100);
-        int time=(int)System.currentTimeMillis()/1000;
+        int time=(int)(System.currentTimeMillis()/1000);
         header.setTime(time);
         buffer.setMsgHeader(header);
         return buffer.build();
