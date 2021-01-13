@@ -1315,6 +1315,15 @@ public final class ClientMessageData {
      * <code>int32 pairFlag = 8;</code>
      */
     int getPairFlag();
+
+    /**
+     * <pre>
+     * 0:持久订阅 1：非持久订阅 
+     * </pre>
+     *
+     * <code>int32 consumeFlag = 9;</code>
+     */
+    int getConsumeFlag();
   }
   /**
    * Protobuf type {@code CBRegisterConsumer}
@@ -1336,6 +1345,7 @@ public final class ClientMessageData {
       identifier_ = 0L;
       domain_ = "";
       pairFlag_ = 0;
+      consumeFlag_ = 0;
     }
 
     @java.lang.Override
@@ -1420,6 +1430,11 @@ public final class ClientMessageData {
             case 64: {
 
               pairFlag_ = input.readInt32();
+              break;
+            }
+            case 72: {
+
+              consumeFlag_ = input.readInt32();
               break;
             }
           }
@@ -1671,6 +1686,19 @@ public final class ClientMessageData {
       return pairFlag_;
     }
 
+    public static final int CONSUMEFLAG_FIELD_NUMBER = 9;
+    private int consumeFlag_;
+    /**
+     * <pre>
+     * 0:持久订阅 1：非持久订阅 
+     * </pre>
+     *
+     * <code>int32 consumeFlag = 9;</code>
+     */
+    public int getConsumeFlag() {
+      return consumeFlag_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1707,6 +1735,9 @@ public final class ClientMessageData {
       if (pairFlag_ != 0) {
         output.writeInt32(8, pairFlag_);
       }
+      if (consumeFlag_ != 0) {
+        output.writeInt32(9, consumeFlag_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1741,6 +1772,10 @@ public final class ClientMessageData {
       if (pairFlag_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(8, pairFlag_);
+      }
+      if (consumeFlag_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(9, consumeFlag_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1777,6 +1812,8 @@ public final class ClientMessageData {
           .equals(other.getDomain());
       result = result && (getPairFlag()
           == other.getPairFlag());
+      result = result && (getConsumeFlag()
+          == other.getConsumeFlag());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1807,6 +1844,8 @@ public final class ClientMessageData {
       hash = (53 * hash) + getDomain().hashCode();
       hash = (37 * hash) + PAIRFLAG_FIELD_NUMBER;
       hash = (53 * hash) + getPairFlag();
+      hash = (37 * hash) + CONSUMEFLAG_FIELD_NUMBER;
+      hash = (53 * hash) + getConsumeFlag();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1956,6 +1995,8 @@ public final class ClientMessageData {
 
         pairFlag_ = 0;
 
+        consumeFlag_ = 0;
+
         return this;
       }
 
@@ -1990,6 +2031,7 @@ public final class ClientMessageData {
         result.identifier_ = identifier_;
         result.domain_ = domain_;
         result.pairFlag_ = pairFlag_;
+        result.consumeFlag_ = consumeFlag_;
         onBuilt();
         return result;
       }
@@ -2059,6 +2101,9 @@ public final class ClientMessageData {
         }
         if (other.getPairFlag() != 0) {
           setPairFlag(other.getPairFlag());
+        }
+        if (other.getConsumeFlag() != 0) {
+          setConsumeFlag(other.getConsumeFlag());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2641,6 +2686,44 @@ public final class ClientMessageData {
       public Builder clearPairFlag() {
         
         pairFlag_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int consumeFlag_ ;
+      /**
+       * <pre>
+       * 0:持久订阅 1：非持久订阅 
+       * </pre>
+       *
+       * <code>int32 consumeFlag = 9;</code>
+       */
+      public int getConsumeFlag() {
+        return consumeFlag_;
+      }
+      /**
+       * <pre>
+       * 0:持久订阅 1：非持久订阅 
+       * </pre>
+       *
+       * <code>int32 consumeFlag = 9;</code>
+       */
+      public Builder setConsumeFlag(int value) {
+        
+        consumeFlag_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 0:持久订阅 1：非持久订阅 
+       * </pre>
+       *
+       * <code>int32 consumeFlag = 9;</code>
+       */
+      public Builder clearConsumeFlag() {
+        
+        consumeFlag_ = 0;
         onChanged();
         return this;
       }
@@ -6846,7 +6929,7 @@ public final class ClientMessageData {
 
     /**
      * <pre>
-     * consumeQueue 偏移量 
+     * consumeQueue 偏移量，-2：状态型（拉取最新消息）-1：使用服务端的消费历史记录 &gt;=0:使用客户端传递的offset获取消息 
      * </pre>
      *
      * <code>int64 consumeQueOffset = 9;</code>
@@ -6855,7 +6938,7 @@ public final class ClientMessageData {
 
     /**
      * <pre>
-     * 0: 正常消费，1：消息回溯 2: 消息回溯并且重置消费记录(服务端消费记录已分配的queid与客户端指定的queid相同) 3:强制重置消费记录 
+     * 备用 
      * </pre>
      *
      * <code>int32 consumeFlag = 10;</code>
@@ -7220,7 +7303,7 @@ public final class ClientMessageData {
     private long consumeQueOffset_;
     /**
      * <pre>
-     * consumeQueue 偏移量 
+     * consumeQueue 偏移量，-2：状态型（拉取最新消息）-1：使用服务端的消费历史记录 &gt;=0:使用客户端传递的offset获取消息 
      * </pre>
      *
      * <code>int64 consumeQueOffset = 9;</code>
@@ -7233,7 +7316,7 @@ public final class ClientMessageData {
     private int consumeFlag_;
     /**
      * <pre>
-     * 0: 正常消费，1：消息回溯 2: 消息回溯并且重置消费记录(服务端消费记录已分配的queid与客户端指定的queid相同) 3:强制重置消费记录 
+     * 备用 
      * </pre>
      *
      * <code>int32 consumeFlag = 10;</code>
@@ -8245,7 +8328,7 @@ public final class ClientMessageData {
       private long consumeQueOffset_ ;
       /**
        * <pre>
-       * consumeQueue 偏移量 
+       * consumeQueue 偏移量，-2：状态型（拉取最新消息）-1：使用服务端的消费历史记录 &gt;=0:使用客户端传递的offset获取消息 
        * </pre>
        *
        * <code>int64 consumeQueOffset = 9;</code>
@@ -8255,7 +8338,7 @@ public final class ClientMessageData {
       }
       /**
        * <pre>
-       * consumeQueue 偏移量 
+       * consumeQueue 偏移量，-2：状态型（拉取最新消息）-1：使用服务端的消费历史记录 &gt;=0:使用客户端传递的offset获取消息 
        * </pre>
        *
        * <code>int64 consumeQueOffset = 9;</code>
@@ -8268,7 +8351,7 @@ public final class ClientMessageData {
       }
       /**
        * <pre>
-       * consumeQueue 偏移量 
+       * consumeQueue 偏移量，-2：状态型（拉取最新消息）-1：使用服务端的消费历史记录 &gt;=0:使用客户端传递的offset获取消息 
        * </pre>
        *
        * <code>int64 consumeQueOffset = 9;</code>
@@ -8283,7 +8366,7 @@ public final class ClientMessageData {
       private int consumeFlag_ ;
       /**
        * <pre>
-       * 0: 正常消费，1：消息回溯 2: 消息回溯并且重置消费记录(服务端消费记录已分配的queid与客户端指定的queid相同) 3:强制重置消费记录 
+       * 备用 
        * </pre>
        *
        * <code>int32 consumeFlag = 10;</code>
@@ -8293,7 +8376,7 @@ public final class ClientMessageData {
       }
       /**
        * <pre>
-       * 0: 正常消费，1：消息回溯 2: 消息回溯并且重置消费记录(服务端消费记录已分配的queid与客户端指定的queid相同) 3:强制重置消费记录 
+       * 备用 
        * </pre>
        *
        * <code>int32 consumeFlag = 10;</code>
@@ -8306,7 +8389,7 @@ public final class ClientMessageData {
       }
       /**
        * <pre>
-       * 0: 正常消费，1：消息回溯 2: 消息回溯并且重置消费记录(服务端消费记录已分配的queid与客户端指定的queid相同) 3:强制重置消费记录 
+       * 备用 
        * </pre>
        *
        * <code>int32 consumeFlag = 10;</code>
@@ -21414,6 +21497,24 @@ public final class ClientMessageData {
      * <code>int64 endPosition = 15;</code>
      */
     long getEndPosition();
+
+    /**
+     * <pre>
+     * 生产者标识 
+     * </pre>
+     *
+     * <code>string producerID = 16;</code>
+     */
+    java.lang.String getProducerID();
+    /**
+     * <pre>
+     * 生产者标识 
+     * </pre>
+     *
+     * <code>string producerID = 16;</code>
+     */
+    com.google.protobuf.ByteString
+        getProducerIDBytes();
   }
   /**
    * Protobuf type {@code CBSendFileRequest}
@@ -21440,6 +21541,7 @@ public final class ClientMessageData {
       splitFileHash_ = "";
       startPosition_ = 0L;
       endPosition_ = 0L;
+      producerID_ = "";
     }
 
     @java.lang.Override
@@ -21574,6 +21676,12 @@ public final class ClientMessageData {
             case 120: {
 
               endPosition_ = input.readInt64();
+              break;
+            }
+            case 130: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              producerID_ = s;
               break;
             }
           }
@@ -21935,6 +22043,48 @@ public final class ClientMessageData {
       return endPosition_;
     }
 
+    public static final int PRODUCERID_FIELD_NUMBER = 16;
+    private volatile java.lang.Object producerID_;
+    /**
+     * <pre>
+     * 生产者标识 
+     * </pre>
+     *
+     * <code>string producerID = 16;</code>
+     */
+    public java.lang.String getProducerID() {
+      java.lang.Object ref = producerID_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        producerID_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 生产者标识 
+     * </pre>
+     *
+     * <code>string producerID = 16;</code>
+     */
+    public com.google.protobuf.ByteString
+        getProducerIDBytes() {
+      java.lang.Object ref = producerID_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        producerID_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -21991,6 +22141,9 @@ public final class ClientMessageData {
       }
       if (endPosition_ != 0L) {
         output.writeInt64(15, endPosition_);
+      }
+      if (!getProducerIDBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 16, producerID_);
       }
       unknownFields.writeTo(output);
     }
@@ -22056,6 +22209,9 @@ public final class ClientMessageData {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(15, endPosition_);
       }
+      if (!getProducerIDBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(16, producerID_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -22111,6 +22267,8 @@ public final class ClientMessageData {
           == other.getStartPosition());
       result = result && (getEndPosition()
           == other.getEndPosition());
+      result = result && getProducerID()
+          .equals(other.getProducerID());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -22162,6 +22320,8 @@ public final class ClientMessageData {
       hash = (37 * hash) + ENDPOSITION_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getEndPosition());
+      hash = (37 * hash) + PRODUCERID_FIELD_NUMBER;
+      hash = (53 * hash) + getProducerID().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -22333,6 +22493,8 @@ public final class ClientMessageData {
 
         endPosition_ = 0L;
 
+        producerID_ = "";
+
         return this;
       }
 
@@ -22382,6 +22544,7 @@ public final class ClientMessageData {
         result.splitFileHash_ = splitFileHash_;
         result.startPosition_ = startPosition_;
         result.endPosition_ = endPosition_;
+        result.producerID_ = producerID_;
         onBuilt();
         return result;
       }
@@ -22471,6 +22634,10 @@ public final class ClientMessageData {
         }
         if (other.getEndPosition() != 0L) {
           setEndPosition(other.getEndPosition());
+        }
+        if (!other.getProducerID().isEmpty()) {
+          producerID_ = other.producerID_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -23512,6 +23679,95 @@ public final class ClientMessageData {
         onChanged();
         return this;
       }
+
+      private java.lang.Object producerID_ = "";
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 16;</code>
+       */
+      public java.lang.String getProducerID() {
+        java.lang.Object ref = producerID_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          producerID_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 16;</code>
+       */
+      public com.google.protobuf.ByteString
+          getProducerIDBytes() {
+        java.lang.Object ref = producerID_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          producerID_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 16;</code>
+       */
+      public Builder setProducerID(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        producerID_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 16;</code>
+       */
+      public Builder clearProducerID() {
+        
+        producerID_ = getDefaultInstance().getProducerID();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 16;</code>
+       */
+      public Builder setProducerIDBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        producerID_ = value;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -23631,6 +23887,24 @@ public final class ClientMessageData {
      * <code>uint64 fileID = 6;</code>
      */
     long getFileID();
+
+    /**
+     * <pre>
+     * 生产者标识 
+     * </pre>
+     *
+     * <code>string producerID = 7;</code>
+     */
+    java.lang.String getProducerID();
+    /**
+     * <pre>
+     * 生产者标识 
+     * </pre>
+     *
+     * <code>string producerID = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getProducerIDBytes();
   }
   /**
    * Protobuf type {@code CBSendFileResponse}
@@ -23650,6 +23924,7 @@ public final class ClientMessageData {
       type_ = 0;
       statusCode_ = 0;
       fileID_ = 0L;
+      producerID_ = "";
     }
 
     @java.lang.Override
@@ -23720,6 +23995,12 @@ public final class ClientMessageData {
             case 48: {
 
               fileID_ = input.readUInt64();
+              break;
+            }
+            case 58: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              producerID_ = s;
               break;
             }
           }
@@ -23861,6 +24142,48 @@ public final class ClientMessageData {
       return fileID_;
     }
 
+    public static final int PRODUCERID_FIELD_NUMBER = 7;
+    private volatile java.lang.Object producerID_;
+    /**
+     * <pre>
+     * 生产者标识 
+     * </pre>
+     *
+     * <code>string producerID = 7;</code>
+     */
+    public java.lang.String getProducerID() {
+      java.lang.Object ref = producerID_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        producerID_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 生产者标识 
+     * </pre>
+     *
+     * <code>string producerID = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getProducerIDBytes() {
+      java.lang.Object ref = producerID_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        producerID_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -23890,6 +24213,9 @@ public final class ClientMessageData {
       }
       if (fileID_ != 0L) {
         output.writeUInt64(6, fileID_);
+      }
+      if (!getProducerIDBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, producerID_);
       }
       unknownFields.writeTo(output);
     }
@@ -23922,6 +24248,9 @@ public final class ClientMessageData {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(6, fileID_);
       }
+      if (!getProducerIDBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, producerID_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -23953,6 +24282,8 @@ public final class ClientMessageData {
           == other.getStatusCode());
       result = result && (getFileID()
           == other.getFileID());
+      result = result && getProducerID()
+          .equals(other.getProducerID());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -23980,6 +24311,8 @@ public final class ClientMessageData {
       hash = (37 * hash) + FILEID_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getFileID());
+      hash = (37 * hash) + PRODUCERID_FIELD_NUMBER;
+      hash = (53 * hash) + getProducerID().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -24125,6 +24458,8 @@ public final class ClientMessageData {
 
         fileID_ = 0L;
 
+        producerID_ = "";
+
         return this;
       }
 
@@ -24157,6 +24492,7 @@ public final class ClientMessageData {
         result.type_ = type_;
         result.statusCode_ = statusCode_;
         result.fileID_ = fileID_;
+        result.producerID_ = producerID_;
         onBuilt();
         return result;
       }
@@ -24216,6 +24552,10 @@ public final class ClientMessageData {
         }
         if (other.getFileID() != 0L) {
           setFileID(other.getFileID());
+        }
+        if (!other.getProducerID().isEmpty()) {
+          producerID_ = other.producerID_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -24601,6 +24941,95 @@ public final class ClientMessageData {
         onChanged();
         return this;
       }
+
+      private java.lang.Object producerID_ = "";
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 7;</code>
+       */
+      public java.lang.String getProducerID() {
+        java.lang.Object ref = producerID_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          producerID_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getProducerIDBytes() {
+        java.lang.Object ref = producerID_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          producerID_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 7;</code>
+       */
+      public Builder setProducerID(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        producerID_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 7;</code>
+       */
+      public Builder clearProducerID() {
+        
+        producerID_ = getDefaultInstance().getProducerID();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 生产者标识 
+       * </pre>
+       *
+       * <code>string producerID = 7;</code>
+       */
+      public Builder setProducerIDBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        producerID_ = value;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -24766,6 +25195,33 @@ public final class ClientMessageData {
      * <code>bytes data = 10;</code>
      */
     com.google.protobuf.ByteString getData();
+
+    /**
+     * <pre>
+     * 消费者标识 
+     * </pre>
+     *
+     * <code>string consumerID = 11;</code>
+     */
+    java.lang.String getConsumerID();
+    /**
+     * <pre>
+     * 消费者标识 
+     * </pre>
+     *
+     * <code>string consumerID = 11;</code>
+     */
+    com.google.protobuf.ByteString
+        getConsumerIDBytes();
+
+    /**
+     * <pre>
+     *文件分片编号，预留
+     * </pre>
+     *
+     * <code>int32 fileIndex = 12;</code>
+     */
+    int getFileIndex();
   }
   /**
    * Protobuf type {@code CBConsumeFileResponse}
@@ -24789,6 +25245,8 @@ public final class ClientMessageData {
       statusCode_ = 0;
       fileID_ = 0L;
       data_ = com.google.protobuf.ByteString.EMPTY;
+      consumerID_ = "";
+      fileIndex_ = 0;
     }
 
     @java.lang.Override
@@ -24881,6 +25339,17 @@ public final class ClientMessageData {
             case 82: {
 
               data_ = input.readBytes();
+              break;
+            }
+            case 90: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              consumerID_ = s;
+              break;
+            }
+            case 96: {
+
+              fileIndex_ = input.readInt32();
               break;
             }
           }
@@ -25124,6 +25593,61 @@ public final class ClientMessageData {
       return data_;
     }
 
+    public static final int CONSUMERID_FIELD_NUMBER = 11;
+    private volatile java.lang.Object consumerID_;
+    /**
+     * <pre>
+     * 消费者标识 
+     * </pre>
+     *
+     * <code>string consumerID = 11;</code>
+     */
+    public java.lang.String getConsumerID() {
+      java.lang.Object ref = consumerID_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        consumerID_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 消费者标识 
+     * </pre>
+     *
+     * <code>string consumerID = 11;</code>
+     */
+    public com.google.protobuf.ByteString
+        getConsumerIDBytes() {
+      java.lang.Object ref = consumerID_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        consumerID_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int FILEINDEX_FIELD_NUMBER = 12;
+    private int fileIndex_;
+    /**
+     * <pre>
+     *文件分片编号，预留
+     * </pre>
+     *
+     * <code>int32 fileIndex = 12;</code>
+     */
+    public int getFileIndex() {
+      return fileIndex_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -25165,6 +25689,12 @@ public final class ClientMessageData {
       }
       if (!data_.isEmpty()) {
         output.writeBytes(10, data_);
+      }
+      if (!getConsumerIDBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 11, consumerID_);
+      }
+      if (fileIndex_ != 0) {
+        output.writeInt32(12, fileIndex_);
       }
       unknownFields.writeTo(output);
     }
@@ -25211,6 +25741,13 @@ public final class ClientMessageData {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(10, data_);
       }
+      if (!getConsumerIDBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(11, consumerID_);
+      }
+      if (fileIndex_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(12, fileIndex_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -25250,6 +25787,10 @@ public final class ClientMessageData {
           == other.getFileID());
       result = result && getData()
           .equals(other.getData());
+      result = result && getConsumerID()
+          .equals(other.getConsumerID());
+      result = result && (getFileIndex()
+          == other.getFileIndex());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -25286,6 +25827,10 @@ public final class ClientMessageData {
           getFileID());
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + CONSUMERID_FIELD_NUMBER;
+      hash = (53 * hash) + getConsumerID().hashCode();
+      hash = (37 * hash) + FILEINDEX_FIELD_NUMBER;
+      hash = (53 * hash) + getFileIndex();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -25439,6 +25984,10 @@ public final class ClientMessageData {
 
         data_ = com.google.protobuf.ByteString.EMPTY;
 
+        consumerID_ = "";
+
+        fileIndex_ = 0;
+
         return this;
       }
 
@@ -25475,6 +26024,8 @@ public final class ClientMessageData {
         result.statusCode_ = statusCode_;
         result.fileID_ = fileID_;
         result.data_ = data_;
+        result.consumerID_ = consumerID_;
+        result.fileIndex_ = fileIndex_;
         onBuilt();
         return result;
       }
@@ -25548,6 +26099,13 @@ public final class ClientMessageData {
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
+        }
+        if (!other.getConsumerID().isEmpty()) {
+          consumerID_ = other.consumerID_;
+          onChanged();
+        }
+        if (other.getFileIndex() != 0) {
+          setFileIndex(other.getFileIndex());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -26170,6 +26728,133 @@ public final class ClientMessageData {
         onChanged();
         return this;
       }
+
+      private java.lang.Object consumerID_ = "";
+      /**
+       * <pre>
+       * 消费者标识 
+       * </pre>
+       *
+       * <code>string consumerID = 11;</code>
+       */
+      public java.lang.String getConsumerID() {
+        java.lang.Object ref = consumerID_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          consumerID_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 消费者标识 
+       * </pre>
+       *
+       * <code>string consumerID = 11;</code>
+       */
+      public com.google.protobuf.ByteString
+          getConsumerIDBytes() {
+        java.lang.Object ref = consumerID_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          consumerID_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 消费者标识 
+       * </pre>
+       *
+       * <code>string consumerID = 11;</code>
+       */
+      public Builder setConsumerID(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        consumerID_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 消费者标识 
+       * </pre>
+       *
+       * <code>string consumerID = 11;</code>
+       */
+      public Builder clearConsumerID() {
+        
+        consumerID_ = getDefaultInstance().getConsumerID();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 消费者标识 
+       * </pre>
+       *
+       * <code>string consumerID = 11;</code>
+       */
+      public Builder setConsumerIDBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        consumerID_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int fileIndex_ ;
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 12;</code>
+       */
+      public int getFileIndex() {
+        return fileIndex_;
+      }
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 12;</code>
+       */
+      public Builder setFileIndex(int value) {
+        
+        fileIndex_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 12;</code>
+       */
+      public Builder clearFileIndex() {
+        
+        fileIndex_ = 0;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -26308,6 +26993,24 @@ public final class ClientMessageData {
      * <code>uint64 fileID = 7;</code>
      */
     long getFileID();
+
+    /**
+     * <pre>
+     *文件分片编号，预留
+     * </pre>
+     *
+     * <code>int32 fileIndex = 8;</code>
+     */
+    int getFileIndex();
+
+    /**
+     * <pre>
+     *文件分片编号hash值，预留
+     * </pre>
+     *
+     * <code>int32 fileIndexHash = 9;</code>
+     */
+    int getFileIndexHash();
   }
   /**
    * Protobuf type {@code CBDownloadRequest}
@@ -26328,6 +27031,8 @@ public final class ClientMessageData {
       endOffset_ = 0L;
       consumerID_ = "";
       fileID_ = 0L;
+      fileIndex_ = 0;
+      fileIndexHash_ = 0;
     }
 
     @java.lang.Override
@@ -26405,6 +27110,16 @@ public final class ClientMessageData {
             case 56: {
 
               fileID_ = input.readUInt64();
+              break;
+            }
+            case 64: {
+
+              fileIndex_ = input.readInt32();
+              break;
+            }
+            case 72: {
+
+              fileIndexHash_ = input.readInt32();
               break;
             }
           }
@@ -26609,6 +27324,32 @@ public final class ClientMessageData {
       return fileID_;
     }
 
+    public static final int FILEINDEX_FIELD_NUMBER = 8;
+    private int fileIndex_;
+    /**
+     * <pre>
+     *文件分片编号，预留
+     * </pre>
+     *
+     * <code>int32 fileIndex = 8;</code>
+     */
+    public int getFileIndex() {
+      return fileIndex_;
+    }
+
+    public static final int FILEINDEXHASH_FIELD_NUMBER = 9;
+    private int fileIndexHash_;
+    /**
+     * <pre>
+     *文件分片编号hash值，预留
+     * </pre>
+     *
+     * <code>int32 fileIndexHash = 9;</code>
+     */
+    public int getFileIndexHash() {
+      return fileIndexHash_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -26641,6 +27382,12 @@ public final class ClientMessageData {
       }
       if (fileID_ != 0L) {
         output.writeUInt64(7, fileID_);
+      }
+      if (fileIndex_ != 0) {
+        output.writeInt32(8, fileIndex_);
+      }
+      if (fileIndexHash_ != 0) {
+        output.writeInt32(9, fileIndexHash_);
       }
       unknownFields.writeTo(output);
     }
@@ -26675,6 +27422,14 @@ public final class ClientMessageData {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(7, fileID_);
       }
+      if (fileIndex_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, fileIndex_);
+      }
+      if (fileIndexHash_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(9, fileIndexHash_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -26708,6 +27463,10 @@ public final class ClientMessageData {
           .equals(other.getConsumerID());
       result = result && (getFileID()
           == other.getFileID());
+      result = result && (getFileIndex()
+          == other.getFileIndex());
+      result = result && (getFileIndexHash()
+          == other.getFileIndexHash());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -26738,6 +27497,10 @@ public final class ClientMessageData {
       hash = (37 * hash) + FILEID_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getFileID());
+      hash = (37 * hash) + FILEINDEX_FIELD_NUMBER;
+      hash = (53 * hash) + getFileIndex();
+      hash = (37 * hash) + FILEINDEXHASH_FIELD_NUMBER;
+      hash = (53 * hash) + getFileIndexHash();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -26885,6 +27648,10 @@ public final class ClientMessageData {
 
         fileID_ = 0L;
 
+        fileIndex_ = 0;
+
+        fileIndexHash_ = 0;
+
         return this;
       }
 
@@ -26918,6 +27685,8 @@ public final class ClientMessageData {
         result.endOffset_ = endOffset_;
         result.consumerID_ = consumerID_;
         result.fileID_ = fileID_;
+        result.fileIndex_ = fileIndex_;
+        result.fileIndexHash_ = fileIndexHash_;
         onBuilt();
         return result;
       }
@@ -26982,6 +27751,12 @@ public final class ClientMessageData {
         }
         if (other.getFileID() != 0L) {
           setFileID(other.getFileID());
+        }
+        if (other.getFileIndex() != 0) {
+          setFileIndex(other.getFileIndex());
+        }
+        if (other.getFileIndexHash() != 0) {
+          setFileIndexHash(other.getFileIndexHash());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -27483,6 +28258,82 @@ public final class ClientMessageData {
         onChanged();
         return this;
       }
+
+      private int fileIndex_ ;
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 8;</code>
+       */
+      public int getFileIndex() {
+        return fileIndex_;
+      }
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 8;</code>
+       */
+      public Builder setFileIndex(int value) {
+        
+        fileIndex_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 8;</code>
+       */
+      public Builder clearFileIndex() {
+        
+        fileIndex_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int fileIndexHash_ ;
+      /**
+       * <pre>
+       *文件分片编号hash值，预留
+       * </pre>
+       *
+       * <code>int32 fileIndexHash = 9;</code>
+       */
+      public int getFileIndexHash() {
+        return fileIndexHash_;
+      }
+      /**
+       * <pre>
+       *文件分片编号hash值，预留
+       * </pre>
+       *
+       * <code>int32 fileIndexHash = 9;</code>
+       */
+      public Builder setFileIndexHash(int value) {
+        
+        fileIndexHash_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *文件分片编号hash值，预留
+       * </pre>
+       *
+       * <code>int32 fileIndexHash = 9;</code>
+       */
+      public Builder clearFileIndexHash() {
+        
+        fileIndexHash_ = 0;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -27629,6 +28480,24 @@ public final class ClientMessageData {
      * <code>bytes data = 8;</code>
      */
     com.google.protobuf.ByteString getData();
+
+    /**
+     * <pre>
+     *文件分片编号，预留
+     * </pre>
+     *
+     * <code>int32 fileIndex = 9;</code>
+     */
+    int getFileIndex();
+
+    /**
+     * <pre>
+     *文件分片编号hash值，预留
+     * </pre>
+     *
+     * <code>int32 fileIndexHash = 10;</code>
+     */
+    int getFileIndexHash();
   }
   /**
    * Protobuf type {@code CBDownloadResponse}
@@ -27650,6 +28519,8 @@ public final class ClientMessageData {
       statusCode_ = 0;
       fileID_ = 0L;
       data_ = com.google.protobuf.ByteString.EMPTY;
+      fileIndex_ = 0;
+      fileIndexHash_ = 0;
     }
 
     @java.lang.Override
@@ -27731,6 +28602,16 @@ public final class ClientMessageData {
             case 66: {
 
               data_ = input.readBytes();
+              break;
+            }
+            case 72: {
+
+              fileIndex_ = input.readInt32();
+              break;
+            }
+            case 80: {
+
+              fileIndexHash_ = input.readInt32();
               break;
             }
           }
@@ -27927,6 +28808,32 @@ public final class ClientMessageData {
       return data_;
     }
 
+    public static final int FILEINDEX_FIELD_NUMBER = 9;
+    private int fileIndex_;
+    /**
+     * <pre>
+     *文件分片编号，预留
+     * </pre>
+     *
+     * <code>int32 fileIndex = 9;</code>
+     */
+    public int getFileIndex() {
+      return fileIndex_;
+    }
+
+    public static final int FILEINDEXHASH_FIELD_NUMBER = 10;
+    private int fileIndexHash_;
+    /**
+     * <pre>
+     *文件分片编号hash值，预留
+     * </pre>
+     *
+     * <code>int32 fileIndexHash = 10;</code>
+     */
+    public int getFileIndexHash() {
+      return fileIndexHash_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -27962,6 +28869,12 @@ public final class ClientMessageData {
       }
       if (!data_.isEmpty()) {
         output.writeBytes(8, data_);
+      }
+      if (fileIndex_ != 0) {
+        output.writeInt32(9, fileIndex_);
+      }
+      if (fileIndexHash_ != 0) {
+        output.writeInt32(10, fileIndexHash_);
       }
       unknownFields.writeTo(output);
     }
@@ -28001,6 +28914,14 @@ public final class ClientMessageData {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(8, data_);
       }
+      if (fileIndex_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(9, fileIndex_);
+      }
+      if (fileIndexHash_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(10, fileIndexHash_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -28036,6 +28957,10 @@ public final class ClientMessageData {
           == other.getFileID());
       result = result && getData()
           .equals(other.getData());
+      result = result && (getFileIndex()
+          == other.getFileIndex());
+      result = result && (getFileIndexHash()
+          == other.getFileIndexHash());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -28068,6 +28993,10 @@ public final class ClientMessageData {
           getFileID());
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + FILEINDEX_FIELD_NUMBER;
+      hash = (53 * hash) + getFileIndex();
+      hash = (37 * hash) + FILEINDEXHASH_FIELD_NUMBER;
+      hash = (53 * hash) + getFileIndexHash();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -28217,6 +29146,10 @@ public final class ClientMessageData {
 
         data_ = com.google.protobuf.ByteString.EMPTY;
 
+        fileIndex_ = 0;
+
+        fileIndexHash_ = 0;
+
         return this;
       }
 
@@ -28251,6 +29184,8 @@ public final class ClientMessageData {
         result.statusCode_ = statusCode_;
         result.fileID_ = fileID_;
         result.data_ = data_;
+        result.fileIndex_ = fileIndex_;
+        result.fileIndexHash_ = fileIndexHash_;
         onBuilt();
         return result;
       }
@@ -28317,6 +29252,12 @@ public final class ClientMessageData {
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
+        }
+        if (other.getFileIndex() != 0) {
+          setFileIndex(other.getFileIndex());
+        }
+        if (other.getFileIndexHash() != 0) {
+          setFileIndexHash(other.getFileIndexHash());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -28829,6 +29770,82 @@ public final class ClientMessageData {
       public Builder clearData() {
         
         data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      private int fileIndex_ ;
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 9;</code>
+       */
+      public int getFileIndex() {
+        return fileIndex_;
+      }
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 9;</code>
+       */
+      public Builder setFileIndex(int value) {
+        
+        fileIndex_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *文件分片编号，预留
+       * </pre>
+       *
+       * <code>int32 fileIndex = 9;</code>
+       */
+      public Builder clearFileIndex() {
+        
+        fileIndex_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int fileIndexHash_ ;
+      /**
+       * <pre>
+       *文件分片编号hash值，预留
+       * </pre>
+       *
+       * <code>int32 fileIndexHash = 10;</code>
+       */
+      public int getFileIndexHash() {
+        return fileIndexHash_;
+      }
+      /**
+       * <pre>
+       *文件分片编号hash值，预留
+       * </pre>
+       *
+       * <code>int32 fileIndexHash = 10;</code>
+       */
+      public Builder setFileIndexHash(int value) {
+        
+        fileIndexHash_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *文件分片编号hash值，预留
+       * </pre>
+       *
+       * <code>int32 fileIndexHash = 10;</code>
+       */
+      public Builder clearFileIndexHash() {
+        
+        fileIndexHash_ = 0;
         onChanged();
         return this;
       }
@@ -45554,154 +46571,158 @@ public final class ClientMessageData {
       "\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\023\n\013isFatC" +
       "lient\030\002 \001(\005\022\020\n\010clientId\030\003 \001(\t\022\022\n\nstatusC" +
       "ode\030\004 \001(\005\022\016\n\006ipaddr\030\005 \001(\005\022\017\n\007ipaddr6\030\006 \001" +
-      "(\t\022\014\n\004port\030\007 \001(\005\022\022\n\nidentifier\030\010 \001(\003\"\261\001\n" +
+      "(\t\022\014\n\004port\030\007 \001(\005\022\022\n\nidentifier\030\010 \001(\003\"\306\001\n" +
       "\022CBRegisterConsumer\022\035\n\014commonHeader\030\001 \001(" +
       "\0132\007.Common\022\020\n\010clientID\030\002 \001(\t\022\021\n\tgroupNam" +
       "e\030\003 \001(\t\022\r\n\005topic\030\004 \001(\t\022\022\n\nconsumerID\030\005 \001" +
       "(\t\022\022\n\nidentifier\030\006 \001(\003\022\016\n\006domain\030\007 \001(\t\022\020" +
-      "\n\010pairFlag\030\010 \001(\005\"\266\001\n\025CBRegisterConsumerA" +
-      "ck\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\020\n\010cli" +
-      "entID\030\002 \001(\t\022\021\n\tgroupName\030\003 \001(\t\022\r\n\005topic\030" +
-      "\004 \001(\t\022\022\n\nconsumerID\030\005 \001(\t\022\022\n\nstatusCode\030" +
-      "\006 \001(\005\022\022\n\nidentifier\030\007 \001(\003\022\016\n\006domain\030\010 \001(" +
-      "\t\"\261\001\n\024CBUnRegisterConsumer\022\035\n\014commonHead" +
-      "er\030\001 \001(\0132\007.Common\022\020\n\010clientID\030\002 \001(\t\022\021\n\tg" +
-      "roupName\030\003 \001(\t\022\r\n\005topic\030\004 \001(\t\022\022\n\nconsume" +
-      "rID\030\005 \001(\t\022\022\n\nidentifier\030\006 \001(\003\022\016\n\006domain\030" +
-      "\007 \001(\t\022\016\n\006linkID\030\010 \001(\005\"\246\001\n\027CBUnRegisterCo" +
-      "nsumerAck\022\035\n\014commonHeader\030\001 \001(\0132\007.Common" +
-      "\022\020\n\010clientID\030\002 \001(\t\022\022\n\nconsumerID\030\003 \001(\t\022\022" +
-      "\n\nstatusCode\030\004 \001(\005\022\022\n\nidentifier\030\005 \001(\003\022\016" +
-      "\n\006domain\030\006 \001(\t\022\016\n\006linkID\030\007 \001(\005\"\364\001\n\027CBCli" +
-      "entConsumerPullMsg\022\035\n\014commonHeader\030\001 \001(\013" +
-      "2\007.Common\022\020\n\010clientID\030\002 \001(\t\022\021\n\tgroupName" +
-      "\030\003 \001(\t\022\r\n\005topic\030\004 \001(\t\022\022\n\nconsumerID\030\005 \001(" +
-      "\t\022\017\n\007pullNum\030\006 \001(\005\022\023\n\013recvBufSize\030\007 \001(\005\022" +
-      "\r\n\005queid\030\010 \001(\005\022\030\n\020consumeQueOffset\030\t \001(\003" +
-      "\022\023\n\013consumeFlag\030\n \001(\005\022\016\n\006domain\030\013 \001(\t\"\253\002" +
-      "\n\017CBBrokerPushMsg\022\035\n\014commonHeader\030\001 \001(\0132" +
-      "\007.Common\022\020\n\010clientID\030\002 \001(\t\022\022\n\nconsumerID" +
-      "\030\003 \001(\t\022\021\n\tgroupName\030\004 \001(\t\022\r\n\005topic\030\005 \001(\t" +
-      "\022\017\n\007queueID\030\006 \001(\005\022\035\n\025minConsumeQueueOffs" +
-      "et\030\007 \001(\003\022\035\n\025maxConsumeQueueOffset\030\010 \001(\003\022" +
-      "\034\n\024consumeHistoryOffset\030\t \001(\003\022\022\n\nstatusC" +
-      "ode\030\n \001(\005\022 \n\010messages\030\013 \003(\0132\016.MessageBuf" +
-      "fer\022\016\n\006domain\030\014 \001(\t\"\211\002\n\023CBClientConsumer" +
-      "Ack\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\020\n\010cl" +
-      "ientID\030\002 \001(\t\022\022\n\nconsumerID\030\003 \001(\t\022\021\n\tgrou" +
-      "pName\030\004 \001(\t\022\r\n\005topic\030\005 \001(\t\022\017\n\007queueID\030\006 " +
-      "\001(\005\022\035\n\025minConsumeQueueOffset\030\007 \001(\003\022\035\n\025ma" +
-      "xConsumeQueueOffset\030\010 \001(\003\022\034\n\024consumeHist" +
-      "oryOffset\030\t \001(\003\022\016\n\006ackNum\030\n \001(\005\022\016\n\006domai" +
-      "n\030\013 \001(\t\"#\n\017PublicMsgHeader\022\020\n\010clientID\030\001" +
-      " \001(\t\"\232\004\n\rMessageHeader\022#\n\tpubHeader\030\001 \001(" +
-      "\0132\020.PublicMsgHeader\022\017\n\007bitFlag\030\002 \001(\r\022\016\n\006" +
-      "expiry\030\003 \001(\005\022\014\n\004time\030\004 \001(\005\022\021\n\tdelayTime\030" +
-      "\005 \001(\005\022\021\n\trolltimes\030\006 \001(\005\022\020\n\010modetype\030\007 \001" +
-      "(\005\022\024\n\014compressType\030\010 \001(\005\022\017\n\007srcSize\030\t \001(" +
-      "\r\022\024\n\014compressSize\030\n \001(\r\022\023\n\013encryptType\030\013" +
-      " \001(\005\022\022\n\nencryptKey\030\014 \001(\t\022\024\n\014transferFlag" +
-      "\030\r \001(\005\022\020\n\010priority\030\016 \001(\005\022\023\n\013persistence\030" +
-      "\017 \001(\005\022\021\n\ttopicName\030\020 \001(\t\022\017\n\007srcNode\030\021 \001(" +
-      "\t\022\r\n\005msgID\030\022 \001(\t\022\022\n\nproofIndex\030\023 \001(\r\022\032\n\022" +
-      "consumeQueueOffset\030\024 \001(\003\022\017\n\007queueID\030\025 \001(" +
-      "\005\022\017\n\007cluster\030\026 \001(\t\022\016\n\006domain\030\027 \001(\t\022\020\n\010br" +
-      "okerId\030\030 \001(\004\022\027\n\017commitLogOffset\030\031 \001(\003\022\032\n" +
-      "\022srcCommitLogOffset\030\032 \001(\003\"2\n\013MessageAttr" +
-      "\022\021\n\tattrCount\030\001 \001(\r\022\020\n\010attrData\030\002 \001(\014\"\222\001" +
-      "\n\rMessageBuffer\022\035\n\014commonHeader\030\001 \001(\0132\007." +
-      "Common\022!\n\tmsgHeader\030\002 \001(\0132\016.MessageHeade" +
-      "r\022\035\n\007msgAttr\030\003 \001(\0132\014.MessageAttr\022\014\n\004data" +
-      "\030\004 \001(\014\022\022\n\nproducerID\030\005 \001(\t\"t\n\nMessageAck" +
+      "\n\010pairFlag\030\010 \001(\005\022\023\n\013consumeFlag\030\t \001(\005\"\266\001" +
+      "\n\025CBRegisterConsumerAck\022\035\n\014commonHeader\030" +
+      "\001 \001(\0132\007.Common\022\020\n\010clientID\030\002 \001(\t\022\021\n\tgrou" +
+      "pName\030\003 \001(\t\022\r\n\005topic\030\004 \001(\t\022\022\n\nconsumerID" +
+      "\030\005 \001(\t\022\022\n\nstatusCode\030\006 \001(\005\022\022\n\nidentifier" +
+      "\030\007 \001(\003\022\016\n\006domain\030\010 \001(\t\"\261\001\n\024CBUnRegisterC" +
+      "onsumer\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\020" +
+      "\n\010clientID\030\002 \001(\t\022\021\n\tgroupName\030\003 \001(\t\022\r\n\005t" +
+      "opic\030\004 \001(\t\022\022\n\nconsumerID\030\005 \001(\t\022\022\n\nidenti" +
+      "fier\030\006 \001(\003\022\016\n\006domain\030\007 \001(\t\022\016\n\006linkID\030\010 \001" +
+      "(\005\"\246\001\n\027CBUnRegisterConsumerAck\022\035\n\014common" +
+      "Header\030\001 \001(\0132\007.Common\022\020\n\010clientID\030\002 \001(\t\022" +
+      "\022\n\nconsumerID\030\003 \001(\t\022\022\n\nstatusCode\030\004 \001(\005\022" +
+      "\022\n\nidentifier\030\005 \001(\003\022\016\n\006domain\030\006 \001(\t\022\016\n\006l" +
+      "inkID\030\007 \001(\005\"\364\001\n\027CBClientConsumerPullMsg\022" +
+      "\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\020\n\010client" +
+      "ID\030\002 \001(\t\022\021\n\tgroupName\030\003 \001(\t\022\r\n\005topic\030\004 \001" +
+      "(\t\022\022\n\nconsumerID\030\005 \001(\t\022\017\n\007pullNum\030\006 \001(\005\022" +
+      "\023\n\013recvBufSize\030\007 \001(\005\022\r\n\005queid\030\010 \001(\005\022\030\n\020c" +
+      "onsumeQueOffset\030\t \001(\003\022\023\n\013consumeFlag\030\n \001" +
+      "(\005\022\016\n\006domain\030\013 \001(\t\"\253\002\n\017CBBrokerPushMsg\022\035" +
+      "\n\014commonHeader\030\001 \001(\0132\007.Common\022\020\n\010clientI" +
+      "D\030\002 \001(\t\022\022\n\nconsumerID\030\003 \001(\t\022\021\n\tgroupName" +
+      "\030\004 \001(\t\022\r\n\005topic\030\005 \001(\t\022\017\n\007queueID\030\006 \001(\005\022\035" +
+      "\n\025minConsumeQueueOffset\030\007 \001(\003\022\035\n\025maxCons" +
+      "umeQueueOffset\030\010 \001(\003\022\034\n\024consumeHistoryOf" +
+      "fset\030\t \001(\003\022\022\n\nstatusCode\030\n \001(\005\022 \n\010messag" +
+      "es\030\013 \003(\0132\016.MessageBuffer\022\016\n\006domain\030\014 \001(\t" +
+      "\"\211\002\n\023CBClientConsumerAck\022\035\n\014commonHeader" +
+      "\030\001 \001(\0132\007.Common\022\020\n\010clientID\030\002 \001(\t\022\022\n\ncon" +
+      "sumerID\030\003 \001(\t\022\021\n\tgroupName\030\004 \001(\t\022\r\n\005topi" +
+      "c\030\005 \001(\t\022\017\n\007queueID\030\006 \001(\005\022\035\n\025minConsumeQu" +
+      "eueOffset\030\007 \001(\003\022\035\n\025maxConsumeQueueOffset" +
+      "\030\010 \001(\003\022\034\n\024consumeHistoryOffset\030\t \001(\003\022\016\n\006" +
+      "ackNum\030\n \001(\005\022\016\n\006domain\030\013 \001(\t\"#\n\017PublicMs" +
+      "gHeader\022\020\n\010clientID\030\001 \001(\t\"\232\004\n\rMessageHea" +
+      "der\022#\n\tpubHeader\030\001 \001(\0132\020.PublicMsgHeader" +
+      "\022\017\n\007bitFlag\030\002 \001(\r\022\016\n\006expiry\030\003 \001(\005\022\014\n\004tim" +
+      "e\030\004 \001(\005\022\021\n\tdelayTime\030\005 \001(\005\022\021\n\trolltimes\030" +
+      "\006 \001(\005\022\020\n\010modetype\030\007 \001(\005\022\024\n\014compressType\030" +
+      "\010 \001(\005\022\017\n\007srcSize\030\t \001(\r\022\024\n\014compressSize\030\n" +
+      " \001(\r\022\023\n\013encryptType\030\013 \001(\005\022\022\n\nencryptKey\030" +
+      "\014 \001(\t\022\024\n\014transferFlag\030\r \001(\005\022\020\n\010priority\030" +
+      "\016 \001(\005\022\023\n\013persistence\030\017 \001(\005\022\021\n\ttopicName\030" +
+      "\020 \001(\t\022\017\n\007srcNode\030\021 \001(\t\022\r\n\005msgID\030\022 \001(\t\022\022\n" +
+      "\nproofIndex\030\023 \001(\r\022\032\n\022consumeQueueOffset\030" +
+      "\024 \001(\003\022\017\n\007queueID\030\025 \001(\005\022\017\n\007cluster\030\026 \001(\t\022" +
+      "\016\n\006domain\030\027 \001(\t\022\020\n\010brokerId\030\030 \001(\004\022\027\n\017com" +
+      "mitLogOffset\030\031 \001(\003\022\032\n\022srcCommitLogOffset" +
+      "\030\032 \001(\003\"2\n\013MessageAttr\022\021\n\tattrCount\030\001 \001(\r" +
+      "\022\020\n\010attrData\030\002 \001(\014\"\222\001\n\rMessageBuffer\022\035\n\014" +
+      "commonHeader\030\001 \001(\0132\007.Common\022!\n\tmsgHeader" +
+      "\030\002 \001(\0132\016.MessageHeader\022\035\n\007msgAttr\030\003 \001(\0132" +
+      "\014.MessageAttr\022\014\n\004data\030\004 \001(\014\022\022\n\nproducerI" +
+      "D\030\005 \001(\t\"t\n\nMessageAck\022\035\n\014commonHeader\030\001 " +
+      "\001(\0132\007.Common\022\020\n\010clientID\030\002 \001(\t\022\r\n\005msgID\030" +
+      "\003 \001(\t\022\022\n\nproducerID\030\004 \001(\t\022\022\n\nstatusCode\030" +
+      "\005 \001(\005\"\254\001\n\013MessageFile\022\035\n\014commonHeader\030\001 " +
+      "\001(\0132\007.Common\022\r\n\005msgID\030\002 \001(\t\022\022\n\nproducerI" +
+      "D\030\003 \001(\t\022\027\n\017beginFileOffset\030\004 \001(\004\022\025\n\rendF" +
+      "ileOffset\030\005 \001(\004\022\014\n\004data\030\006 \001(\014\022\016\n\006fileID\030" +
+      "\007 \001(\004\022\r\n\005index\030\010 \001(\005\"\230\001\n\016MessageFileAck\022" +
+      "\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\r\n\005msgID\030" +
+      "\002 \001(\t\022\022\n\nproducerID\030\003 \001(\t\022\022\n\nfileOffset\030" +
+      "\004 \001(\004\022\022\n\nstatusCode\030\005 \001(\005\022\016\n\006fileID\030\006 \001(" +
+      "\004\022\014\n\004type\030\007 \001(\005\"\365\002\n\021CBSendFileRequest\022\035\n" +
+      "\014commonHeader\030\001 \001(\0132\007.Common\022!\n\tmsgHeade" +
+      "r\030\002 \001(\0132\016.MessageHeader\022\035\n\007msgAttr\030\003 \001(\013" +
+      "2\014.MessageAttr\022\020\n\010fileAttr\030\004 \001(\r\022\020\n\010file" +
+      "Hash\030\005 \001(\t\022\020\n\010fileName\030\006 \001(\t\022\020\n\010filePath" +
+      "\030\007 \001(\t\022\024\n\014realFileSize\030\010 \001(\004\022\024\n\014original" +
+      "Size\030\t \001(\004\022\014\n\004data\030\n \001(\014\022\027\n\017breakPointTr" +
+      "ans\030\013 \001(\005\022\r\n\005index\030\014 \001(\005\022\025\n\rsplitFileHas" +
+      "h\030\r \001(\t\022\025\n\rstartPosition\030\016 \001(\003\022\023\n\013endPos" +
+      "ition\030\017 \001(\003\022\022\n\nproducerID\030\020 \001(\t\"\234\001\n\022CBSe" +
+      "ndFileResponse\022\035\n\014commonHeader\030\001 \001(\0132\007.C" +
+      "ommon\022\r\n\005msgID\030\002 \001(\t\022\022\n\nfileOffset\030\003 \001(\004" +
+      "\022\014\n\004type\030\004 \001(\005\022\022\n\nstatusCode\030\005 \001(\005\022\016\n\006fi" +
+      "leID\030\006 \001(\004\022\022\n\nproducerID\030\007 \001(\t\"\374\001\n\025CBCon" +
+      "sumeFileResponse\022\035\n\014commonHeader\030\001 \001(\0132\007" +
+      ".Common\022\r\n\005msgID\030\002 \001(\t\022\020\n\010fileAttr\030\003 \001(\r" +
+      "\022\014\n\004hash\030\004 \001(\t\022\020\n\010fileName\030\005 \001(\t\022\024\n\014real" +
+      "FileSize\030\006 \001(\004\022\024\n\014originalSize\030\007 \001(\004\022\022\n\n" +
+      "statusCode\030\010 \001(\005\022\016\n\006fileID\030\t \001(\004\022\014\n\004data" +
+      "\030\n \001(\014\022\022\n\nconsumerID\030\013 \001(\t\022\021\n\tfileIndex\030" +
+      "\014 \001(\005\"\311\001\n\021CBDownloadRequest\022\035\n\014commonHea" +
+      "der\030\001 \001(\0132\007.Common\022\r\n\005msgID\030\002 \001(\t\022\020\n\010fil" +
+      "eName\030\003 \001(\t\022\023\n\013beginOffset\030\004 \001(\004\022\021\n\tendO" +
+      "ffset\030\005 \001(\004\022\022\n\nconsumerID\030\006 \001(\t\022\016\n\006fileI" +
+      "D\030\007 \001(\004\022\021\n\tfileIndex\030\010 \001(\005\022\025\n\rfileIndexH" +
+      "ash\030\t \001(\005\"\342\001\n\022CBDownloadResponse\022\035\n\014comm" +
+      "onHeader\030\001 \001(\0132\007.Common\022\r\n\005msgID\030\002 \001(\t\022\022" +
+      "\n\nconsumerID\030\003 \001(\t\022\027\n\017beginFileOffset\030\004 " +
+      "\001(\004\022\025\n\rendFileOffset\030\005 \001(\004\022\022\n\nstatusCode" +
+      "\030\006 \001(\005\022\016\n\006fileID\030\007 \001(\004\022\014\n\004data\030\010 \001(\014\022\021\n\t" +
+      "fileIndex\030\t \001(\005\022\025\n\rfileIndexHash\030\n \001(\005\"\315" +
+      "\001\n\017TopicBrokerInfo\022\021\n\ttopicName\030\001 \001(\t\022\016\n" +
+      "\006ipaddr\030\002 \001(\005\022\014\n\004port\030\003 \001(\005\022\r\n\005state\030\004 \001" +
+      "(\005\022\017\n\007ipaddr6\030\005 \001(\t\022\017\n\007cluster\030\006 \001(\t\022\016\n\006" +
+      "domain\030\007 \001(\t\022\020\n\010brokerId\030\010 \001(\004\022\017\n\007isProx" +
+      "y\030\t \001(\005\022\022\n\nproducerId\030\n \001(\t\022\021\n\tqueueName" +
+      "\030\013 \001(\t\"\342\001\n\024TLQTopicRouteRequest\022\035\n\014commo" +
+      "nHeader\030\001 \001(\0132\007.Common\022\016\n\006ipaddr\030\002 \001(\005\022\014" +
+      "\n\004port\030\003 \001(\005\022\020\n\010clientId\030\004 \001(\t\022\021\n\ttopicN" +
+      "ame\030\005 \001(\t\022\017\n\007ipaddr6\030\006 \001(\t\022\016\n\006putGet\030\007 \001" +
+      "(\005\022\020\n\010useProxy\030\010 \001(\005\022\016\n\006domain\030\t \001(\t\022\022\n\n" +
+      "producerId\030\n \001(\t\022\021\n\tqueueName\030\013 \001(\t\"Y\n\025T" +
+      "LQTopicRouteResponse\022\035\n\014commonHeader\030\001 \001" +
+      "(\0132\007.Common\022!\n\007msgInfo\030\002 \003(\0132\020.TopicBrok" +
+      "erInfo\"\213\001\n\031TLQClientHeartbeatRequest\022\035\n\014" +
+      "commonHeader\030\001 \001(\0132\007.Common\022\016\n\006ipaddr\030\002 " +
+      "\001(\005\022\014\n\004port\030\003 \001(\005\022\016\n\006linkId\030\004 \001(\005\022\020\n\010cli" +
+      "entId\030\005 \001(\t\022\017\n\007ipaddr6\030\006 \001(\t\"^\n\032TLQClien" +
+      "tHeartbeatResponse\022\035\n\014commonHeader\030\001 \001(\013" +
+      "2\007.Common\022!\n\007msgInfo\030\002 \003(\0132\020.TopicBroker" +
+      "Info\"c\n TLQClientBrokerHeartbeatResponse" +
       "\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\020\n\010clien" +
-      "tID\030\002 \001(\t\022\r\n\005msgID\030\003 \001(\t\022\022\n\nproducerID\030\004" +
-      " \001(\t\022\022\n\nstatusCode\030\005 \001(\005\"\254\001\n\013MessageFile" +
-      "\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\r\n\005msgID" +
-      "\030\002 \001(\t\022\022\n\nproducerID\030\003 \001(\t\022\027\n\017beginFileO" +
-      "ffset\030\004 \001(\004\022\025\n\rendFileOffset\030\005 \001(\004\022\014\n\004da" +
-      "ta\030\006 \001(\014\022\016\n\006fileID\030\007 \001(\004\022\r\n\005index\030\010 \001(\005\"" +
-      "\230\001\n\016MessageFileAck\022\035\n\014commonHeader\030\001 \001(\013" +
-      "2\007.Common\022\r\n\005msgID\030\002 \001(\t\022\022\n\nproducerID\030\003" +
-      " \001(\t\022\022\n\nfileOffset\030\004 \001(\004\022\022\n\nstatusCode\030\005" +
-      " \001(\005\022\016\n\006fileID\030\006 \001(\004\022\014\n\004type\030\007 \001(\005\"\341\002\n\021C" +
-      "BSendFileRequest\022\035\n\014commonHeader\030\001 \001(\0132\007" +
-      ".Common\022!\n\tmsgHeader\030\002 \001(\0132\016.MessageHead" +
-      "er\022\035\n\007msgAttr\030\003 \001(\0132\014.MessageAttr\022\020\n\010fil" +
-      "eAttr\030\004 \001(\r\022\020\n\010fileHash\030\005 \001(\t\022\020\n\010fileNam" +
-      "e\030\006 \001(\t\022\020\n\010filePath\030\007 \001(\t\022\024\n\014realFileSiz" +
-      "e\030\010 \001(\004\022\024\n\014originalSize\030\t \001(\004\022\014\n\004data\030\n " +
-      "\001(\014\022\027\n\017breakPointTrans\030\013 \001(\005\022\r\n\005index\030\014 " +
-      "\001(\005\022\025\n\rsplitFileHash\030\r \001(\t\022\025\n\rstartPosit" +
-      "ion\030\016 \001(\003\022\023\n\013endPosition\030\017 \001(\003\"\210\001\n\022CBSen" +
-      "dFileResponse\022\035\n\014commonHeader\030\001 \001(\0132\007.Co" +
-      "mmon\022\r\n\005msgID\030\002 \001(\t\022\022\n\nfileOffset\030\003 \001(\004\022" +
-      "\014\n\004type\030\004 \001(\005\022\022\n\nstatusCode\030\005 \001(\005\022\016\n\006fil" +
-      "eID\030\006 \001(\004\"\325\001\n\025CBConsumeFileResponse\022\035\n\014c" +
-      "ommonHeader\030\001 \001(\0132\007.Common\022\r\n\005msgID\030\002 \001(" +
-      "\t\022\020\n\010fileAttr\030\003 \001(\r\022\014\n\004hash\030\004 \001(\t\022\020\n\010fil" +
-      "eName\030\005 \001(\t\022\024\n\014realFileSize\030\006 \001(\004\022\024\n\014ori" +
-      "ginalSize\030\007 \001(\004\022\022\n\nstatusCode\030\010 \001(\005\022\016\n\006f" +
-      "ileID\030\t \001(\004\022\014\n\004data\030\n \001(\014\"\237\001\n\021CBDownload" +
-      "Request\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\r" +
-      "\n\005msgID\030\002 \001(\t\022\020\n\010fileName\030\003 \001(\t\022\023\n\013begin" +
-      "Offset\030\004 \001(\004\022\021\n\tendOffset\030\005 \001(\004\022\022\n\nconsu" +
-      "merID\030\006 \001(\t\022\016\n\006fileID\030\007 \001(\004\"\270\001\n\022CBDownlo" +
-      "adResponse\022\035\n\014commonHeader\030\001 \001(\0132\007.Commo" +
-      "n\022\r\n\005msgID\030\002 \001(\t\022\022\n\nconsumerID\030\003 \001(\t\022\027\n\017" +
-      "beginFileOffset\030\004 \001(\004\022\025\n\rendFileOffset\030\005" +
-      " \001(\004\022\022\n\nstatusCode\030\006 \001(\005\022\016\n\006fileID\030\007 \001(\004" +
-      "\022\014\n\004data\030\010 \001(\014\"\315\001\n\017TopicBrokerInfo\022\021\n\tto" +
-      "picName\030\001 \001(\t\022\016\n\006ipaddr\030\002 \001(\005\022\014\n\004port\030\003 " +
-      "\001(\005\022\r\n\005state\030\004 \001(\005\022\017\n\007ipaddr6\030\005 \001(\t\022\017\n\007c" +
-      "luster\030\006 \001(\t\022\016\n\006domain\030\007 \001(\t\022\020\n\010brokerId" +
-      "\030\010 \001(\004\022\017\n\007isProxy\030\t \001(\005\022\022\n\nproducerId\030\n " +
-      "\001(\t\022\021\n\tqueueName\030\013 \001(\t\"\342\001\n\024TLQTopicRoute" +
-      "Request\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\016" +
-      "\n\006ipaddr\030\002 \001(\005\022\014\n\004port\030\003 \001(\005\022\020\n\010clientId" +
-      "\030\004 \001(\t\022\021\n\ttopicName\030\005 \001(\t\022\017\n\007ipaddr6\030\006 \001" +
-      "(\t\022\016\n\006putGet\030\007 \001(\005\022\020\n\010useProxy\030\010 \001(\005\022\016\n\006" +
-      "domain\030\t \001(\t\022\022\n\nproducerId\030\n \001(\t\022\021\n\tqueu" +
-      "eName\030\013 \001(\t\"Y\n\025TLQTopicRouteResponse\022\035\n\014" +
-      "commonHeader\030\001 \001(\0132\007.Common\022!\n\007msgInfo\030\002" +
-      " \003(\0132\020.TopicBrokerInfo\"\213\001\n\031TLQClientHear" +
-      "tbeatRequest\022\035\n\014commonHeader\030\001 \001(\0132\007.Com" +
-      "mon\022\016\n\006ipaddr\030\002 \001(\005\022\014\n\004port\030\003 \001(\005\022\016\n\006lin" +
-      "kId\030\004 \001(\005\022\020\n\010clientId\030\005 \001(\t\022\017\n\007ipaddr6\030\006" +
-      " \001(\t\"^\n\032TLQClientHeartbeatResponse\022\035\n\014co" +
-      "mmonHeader\030\001 \001(\0132\007.Common\022!\n\007msgInfo\030\002 \003" +
-      "(\0132\020.TopicBrokerInfo\"c\n TLQClientBrokerH" +
-      "eartbeatResponse\022\035\n\014commonHeader\030\001 \001(\0132\007" +
-      ".Common\022\020\n\010clientId\030\002 \001(\t\022\016\n\006linkId\030\003 \001(" +
-      "\005\"\216\001\n\024CBClientBatchPushMsg\022\035\n\014commonHead" +
-      "er\030\001 \001(\0132\007.Common\022\020\n\010clientID\030\002 \001(\t\022\022\n\np" +
-      "roducerID\030\003 \001(\t\022\017\n\007batchID\030\004 \001(\003\022 \n\010mess" +
-      "ages\030\005 \003(\0132\016.MessageBuffer\"\203\001\n\027CBClientB" +
-      "atchPushMsgAck\022\035\n\014commonHeader\030\001 \001(\0132\007.C" +
-      "ommon\022\020\n\010clientID\030\002 \001(\t\022\017\n\007batchID\030\003 \001(\003" +
-      "\022\022\n\nstatusCode\030\004 \001(\005\022\022\n\nproducerID\030\005 \001(\t" +
-      "\"\257\001\n\027CNConsumeRollbackByTime\022\035\n\014commonHe" +
-      "ader\030\001 \001(\0132\007.Common\022\020\n\010clientID\030\002 \001(\t\022\021\n" +
-      "\ttopicName\030\003 \001(\t\022\021\n\tgroupName\030\004 \001(\t\022\031\n\021r" +
-      "ollbackTimeStamp\030\005 \001(\005\022\016\n\006domain\030\006 \001(\t\022\022" +
-      "\n\nidentifier\030\007 \001(\003\"\204\001\n\032CNConsumeRollback" +
-      "ByTimeAck\022\035\n\014commonHeader\030\001 \001(\0132\007.Common" +
-      "\022\020\n\010clientID\030\002 \001(\t\022\022\n\nresultCode\030\003 \001(\005\022!" +
-      "\n\007msgInfo\030\004 \003(\0132\020.TopicBrokerInfo\"\242\001\n\022CB" +
-      "RegisterProducer\022\035\n\014commonHeader\030\001 \001(\0132\007" +
-      ".Common\022\022\n\nidentifier\030\002 \001(\003\022\020\n\010clientID\030" +
-      "\003 \001(\t\022\022\n\nproducerID\030\004 \001(\t\022\021\n\ttopicName\030\005" +
-      " \001(\t\022\016\n\006domain\030\006 \001(\t\022\020\n\010pairFlag\030\007 \001(\005\"\204" +
-      "\001\n\025CBRegisterProducerAck\022\035\n\014commonHeader" +
-      "\030\001 \001(\0132\007.Common\022\022\n\nidentifier\030\002 \001(\003\022\020\n\010c" +
-      "lientID\030\003 \001(\t\022\022\n\nproducerID\030\004 \001(\t\022\022\n\nsta" +
-      "tusCode\030\005 \001(\005\"o\n\024CBUnRegisterProducer\022\035\n" +
-      "\014commonHeader\030\001 \001(\0132\007.Common\022\022\n\nidentifi" +
-      "er\030\002 \001(\003\022\020\n\010clientID\030\003 \001(\t\022\022\n\nproducerID" +
-      "\030\004 \001(\t\"\206\001\n\027CBUnRegisterProducerAck\022\035\n\014co" +
-      "mmonHeader\030\001 \001(\0132\007.Common\022\022\n\nidentifier\030" +
-      "\002 \001(\003\022\020\n\010clientID\030\003 \001(\t\022\022\n\nproducerID\030\004 " +
-      "\001(\t\022\022\n\nstatusCode\030\005 \001(\005B\023B\021ClientMessage" +
-      "Datab\006proto3"
+      "tId\030\002 \001(\t\022\016\n\006linkId\030\003 \001(\005\"\216\001\n\024CBClientBa" +
+      "tchPushMsg\022\035\n\014commonHeader\030\001 \001(\0132\007.Commo" +
+      "n\022\020\n\010clientID\030\002 \001(\t\022\022\n\nproducerID\030\003 \001(\t\022" +
+      "\017\n\007batchID\030\004 \001(\003\022 \n\010messages\030\005 \003(\0132\016.Mes" +
+      "sageBuffer\"\203\001\n\027CBClientBatchPushMsgAck\022\035" +
+      "\n\014commonHeader\030\001 \001(\0132\007.Common\022\020\n\010clientI" +
+      "D\030\002 \001(\t\022\017\n\007batchID\030\003 \001(\003\022\022\n\nstatusCode\030\004" +
+      " \001(\005\022\022\n\nproducerID\030\005 \001(\t\"\257\001\n\027CNConsumeRo" +
+      "llbackByTime\022\035\n\014commonHeader\030\001 \001(\0132\007.Com" +
+      "mon\022\020\n\010clientID\030\002 \001(\t\022\021\n\ttopicName\030\003 \001(\t" +
+      "\022\021\n\tgroupName\030\004 \001(\t\022\031\n\021rollbackTimeStamp" +
+      "\030\005 \001(\005\022\016\n\006domain\030\006 \001(\t\022\022\n\nidentifier\030\007 \001" +
+      "(\003\"\204\001\n\032CNConsumeRollbackByTimeAck\022\035\n\014com" +
+      "monHeader\030\001 \001(\0132\007.Common\022\020\n\010clientID\030\002 \001" +
+      "(\t\022\022\n\nresultCode\030\003 \001(\005\022!\n\007msgInfo\030\004 \003(\0132" +
+      "\020.TopicBrokerInfo\"\242\001\n\022CBRegisterProducer" +
+      "\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022\022\n\nident" +
+      "ifier\030\002 \001(\003\022\020\n\010clientID\030\003 \001(\t\022\022\n\nproduce" +
+      "rID\030\004 \001(\t\022\021\n\ttopicName\030\005 \001(\t\022\016\n\006domain\030\006" +
+      " \001(\t\022\020\n\010pairFlag\030\007 \001(\005\"\204\001\n\025CBRegisterPro" +
+      "ducerAck\022\035\n\014commonHeader\030\001 \001(\0132\007.Common\022" +
+      "\022\n\nidentifier\030\002 \001(\003\022\020\n\010clientID\030\003 \001(\t\022\022\n" +
+      "\nproducerID\030\004 \001(\t\022\022\n\nstatusCode\030\005 \001(\005\"o\n" +
+      "\024CBUnRegisterProducer\022\035\n\014commonHeader\030\001 " +
+      "\001(\0132\007.Common\022\022\n\nidentifier\030\002 \001(\003\022\020\n\010clie" +
+      "ntID\030\003 \001(\t\022\022\n\nproducerID\030\004 \001(\t\"\206\001\n\027CBUnR" +
+      "egisterProducerAck\022\035\n\014commonHeader\030\001 \001(\013" +
+      "2\007.Common\022\022\n\nidentifier\030\002 \001(\003\022\020\n\010clientI" +
+      "D\030\003 \001(\t\022\022\n\nproducerID\030\004 \001(\t\022\022\n\nstatusCod" +
+      "e\030\005 \001(\005B\023B\021ClientMessageDatab\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -45727,7 +46748,7 @@ public final class ClientMessageData {
     internal_static_CBRegisterConsumer_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CBRegisterConsumer_descriptor,
-        new java.lang.String[] { "CommonHeader", "ClientID", "GroupName", "Topic", "ConsumerID", "Identifier", "Domain", "PairFlag", });
+        new java.lang.String[] { "CommonHeader", "ClientID", "GroupName", "Topic", "ConsumerID", "Identifier", "Domain", "PairFlag", "ConsumeFlag", });
     internal_static_CBRegisterConsumerAck_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_CBRegisterConsumerAck_fieldAccessorTable = new
@@ -45811,31 +46832,31 @@ public final class ClientMessageData {
     internal_static_CBSendFileRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CBSendFileRequest_descriptor,
-        new java.lang.String[] { "CommonHeader", "MsgHeader", "MsgAttr", "FileAttr", "FileHash", "FileName", "FilePath", "RealFileSize", "OriginalSize", "Data", "BreakPointTrans", "Index", "SplitFileHash", "StartPosition", "EndPosition", });
+        new java.lang.String[] { "CommonHeader", "MsgHeader", "MsgAttr", "FileAttr", "FileHash", "FileName", "FilePath", "RealFileSize", "OriginalSize", "Data", "BreakPointTrans", "Index", "SplitFileHash", "StartPosition", "EndPosition", "ProducerID", });
     internal_static_CBSendFileResponse_descriptor =
       getDescriptor().getMessageTypes().get(16);
     internal_static_CBSendFileResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CBSendFileResponse_descriptor,
-        new java.lang.String[] { "CommonHeader", "MsgID", "FileOffset", "Type", "StatusCode", "FileID", });
+        new java.lang.String[] { "CommonHeader", "MsgID", "FileOffset", "Type", "StatusCode", "FileID", "ProducerID", });
     internal_static_CBConsumeFileResponse_descriptor =
       getDescriptor().getMessageTypes().get(17);
     internal_static_CBConsumeFileResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CBConsumeFileResponse_descriptor,
-        new java.lang.String[] { "CommonHeader", "MsgID", "FileAttr", "Hash", "FileName", "RealFileSize", "OriginalSize", "StatusCode", "FileID", "Data", });
+        new java.lang.String[] { "CommonHeader", "MsgID", "FileAttr", "Hash", "FileName", "RealFileSize", "OriginalSize", "StatusCode", "FileID", "Data", "ConsumerID", "FileIndex", });
     internal_static_CBDownloadRequest_descriptor =
       getDescriptor().getMessageTypes().get(18);
     internal_static_CBDownloadRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CBDownloadRequest_descriptor,
-        new java.lang.String[] { "CommonHeader", "MsgID", "FileName", "BeginOffset", "EndOffset", "ConsumerID", "FileID", });
+        new java.lang.String[] { "CommonHeader", "MsgID", "FileName", "BeginOffset", "EndOffset", "ConsumerID", "FileID", "FileIndex", "FileIndexHash", });
     internal_static_CBDownloadResponse_descriptor =
       getDescriptor().getMessageTypes().get(19);
     internal_static_CBDownloadResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CBDownloadResponse_descriptor,
-        new java.lang.String[] { "CommonHeader", "MsgID", "ConsumerID", "BeginFileOffset", "EndFileOffset", "StatusCode", "FileID", "Data", });
+        new java.lang.String[] { "CommonHeader", "MsgID", "ConsumerID", "BeginFileOffset", "EndFileOffset", "StatusCode", "FileID", "Data", "FileIndex", "FileIndexHash", });
     internal_static_TopicBrokerInfo_descriptor =
       getDescriptor().getMessageTypes().get(20);
     internal_static_TopicBrokerInfo_fieldAccessorTable = new
