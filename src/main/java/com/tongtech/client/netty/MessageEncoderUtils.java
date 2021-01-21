@@ -30,7 +30,7 @@ public class MessageEncoderUtils {
     private static FileChannel fileChannel;
     private static int sumFile = 0;
     private static AtomicInteger requestId = new AtomicInteger(1);
-    private static AtomicInteger offset = new AtomicInteger(1);
+    private static AtomicInteger offset = new AtomicInteger(0);
     private static AtomicInteger messageCount = new AtomicInteger(1);
 
     private static ConcurrentMap<String, String> managerCache = new ConcurrentHashMap<>();
@@ -222,7 +222,8 @@ public class MessageEncoderUtils {
                         //基于偏移量拉取消息
                         int pullNum=pullMsg.getPullNum();
                         minConsumeQueueOffset=pullMsg.getConsumeQueOffset();
-                        for(long i=pullMsg.getConsumeQueOffset();i<=pullNum;i++){
+                        long start=pullMsg.getConsumeQueOffset();
+                        for(long i=start;i<=start+pullNum;i++){
                             ClientMessageData.MessageBuffer messageBuffer = findMessageBuffer(pullMsg.getTopic(),pullMsg.getDomain(), i);
                             if(messageBuffer!=null){
                                 cbBrokerPushMsg.addMessages(messageBuffer);
@@ -231,7 +232,7 @@ public class MessageEncoderUtils {
                         }
                     }
                     cbBrokerPushMsg.setMinConsumeQueueOffset(minConsumeQueueOffset);
-                    cbBrokerPushMsg.setMaxConsumeQueueOffset(maxConsumeQueueOffset);
+                    cbBrokerPushMsg.setMaxConsumeQueueOffset(maxConsumeQueueOffset+1);
                     ClientMessageData.CBBrokerPushMsg pushMsg = cbBrokerPushMsg.build();
                     length = pushMsg.toByteArray().length;
                     body = pushMsg.toByteArray();
@@ -359,7 +360,7 @@ public class MessageEncoderUtils {
                 ClientMessageData.TopicBrokerInfo.Builder topicInfo = ClientMessageData.TopicBrokerInfo.newBuilder();
                 topicInfo.setIpaddr(IpUtils.IpToInt("127.0.0.1"));
                 //topicInfo.setIpaddr6("0:0:0:0:0:0:0:1");
-                topicInfo.setPort(9999);
+                topicInfo.setPort(port);
                 if (!Validators.isEmpty(routeRequest.getTopicName())) {
                     topicInfo.setTopicName(routeRequest.getTopicName());
                 }
