@@ -15,6 +15,7 @@ public class Main {
 
     public static void main(String[] args) {
         ServerSocket serverSocket = null;
+        //创建连接池
         ExecutorService executorService = Executors.newCachedThreadPool();
         System.out.println("服务端 " + SocketUtil.getIP() + " 运行中...\n");
         try {

@@ -17,10 +17,10 @@ public class FileMsg implements Serializable {
     private int breakFlag; //断点续传标志。服务端默认不删除后台文件。1续传，0不续传
     private String splitFileHash;/* 分片文件hash值 */
 
-    private long fileOffset ; //broker上已经存储的文件大小
+    private long fileOffset; //broker上已经存储的文件大小
 
-    private String msgID ;
-    private long fileID ;
+    private String msgID;
+    private long fileID;
 
     public String getMsgID() {
         return msgID;

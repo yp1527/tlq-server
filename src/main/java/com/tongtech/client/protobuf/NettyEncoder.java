@@ -11,6 +11,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 public class NettyEncoder extends MessageToByteEncoder<RemotingCommand> {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, RemotingCommand message, ByteBuf out) throws Exception {
+        //LD: 将消息直接转化为byteBuf流，不需要特殊操作，因为字节屏蔽了所有细节
         out.writeShort(message.getVerNo());
         out.writeShort(message.getCommandType());
         out.writeInt(message.getLength());

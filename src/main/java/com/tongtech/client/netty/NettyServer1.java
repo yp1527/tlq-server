@@ -33,6 +33,7 @@ public class NettyServer1 {
 
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
+                            //添加处理链条结点
                             ChannelPipeline pipeline = ch.pipeline();
                             pipeline.addLast("decoder",new NettyDecoder());
                             pipeline.addLast("encoder",new NettyEncoder());
@@ -43,6 +44,7 @@ public class NettyServer1 {
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture future = b.bind(port).sync();
             System.out.println("NettyServer start listen at " + port );
+            //每隔5秒延迟5秒
             this.timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {

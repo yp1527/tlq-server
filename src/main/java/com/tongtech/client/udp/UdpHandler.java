@@ -26,7 +26,7 @@ public class UdpHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         byte[] content = new byte[length];
         in.readBytes(content);
         //消息解码
-        RemotingCommand message= MessageDecoderUtils.MessageDecoderToRemotingCommand(content,commandtype);
+        RemotingCommand message= MessageDecoderUtils.MessageDecoderToRemotingCommand(content,commandtype,ctx);
         message.setLength(length);
         message.setVerNo(version);
         message.setBody(content);

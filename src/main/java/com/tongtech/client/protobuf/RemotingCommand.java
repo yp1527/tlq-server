@@ -14,6 +14,7 @@ public class RemotingCommand {
     private String remark;
     private HashMap<String, String> extFields;
     private transient byte[] body;
+    private int modeType;
 
     private Object message;
 
@@ -97,6 +98,14 @@ public class RemotingCommand {
         this.body = body;
     }
 
+    public int getModeType() {
+        return modeType;
+    }
+
+    public void setModeType(int modeType) {
+        this.modeType = modeType;
+    }
+
     @Override
     public String toString() {
         return "RemotingCommand{" +
@@ -108,6 +117,7 @@ public class RemotingCommand {
                 ", remark='" + remark + '\'' +
                 ", extFields=" + extFields +
                 ", body=" + Arrays.toString(body) +
+                ", message=" + message +
                 '}';
     }
 }
