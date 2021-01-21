@@ -37,7 +37,7 @@ public class UdpHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         commonMessage.setCommandType(commandtype);
         commonMessage.setRequestId(message.getOpaque());
         commonMessage.setVerNo(0);
-        RemotingCommand command=MessageEncoderUtils.MessageEncoderToRemotingCommand(commonMessage,message);
+        RemotingCommand command=MessageEncoderUtils.MessageEncoderToRemotingCommand(commonMessage,message,9999,"topic");
 
 
         System.out.println("length:"+command.getBody().length);

@@ -1,13 +1,18 @@
 package com.tongtech.client.netty;
 
-import com.tongtech.client.broker.ClientChannelInfo;
-import com.tongtech.client.domain.Message;
-import com.tongtech.client.enums.CB_REQUEST;
 import com.tongtech.client.protobuf.RemotingCommand;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
+
+    public  int port;
+    public  String topic;
+
+    public ClientHandler(int port, String topic) {
+        this.port = port;
+        this.topic = topic;
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -20,7 +25,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         message.setVerNo(0);
         //LD: 根据来源消息内容发送对于的远程信息回到客户端，应该是一个handle过程
         
-        RemotingCommand command=MessageEncoderUtils.MessageEncoderToRemotingCommand(message,remotingCommand);
+        RemotingCommand command=MessageEncoderUtils.MessageEncoderToRemotingCommand(message,remotingCommand,this.port,this.topic);
         ctx.writeAndFlush(command);
     }
 

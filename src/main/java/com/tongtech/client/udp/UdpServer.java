@@ -13,6 +13,7 @@ public class UdpServer {
     private final Bootstrap bootstrap;
     private final NioEventLoopGroup acceptGroup;
     private Channel channel;
+
     public void start(String host,int port) throws Exception{
         try {
             channel = bootstrap.bind(host, port).sync().channel();

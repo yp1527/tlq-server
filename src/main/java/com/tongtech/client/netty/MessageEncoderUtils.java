@@ -57,10 +57,10 @@ public class MessageEncoderUtils {
     public static List<ClientMessageData.MessageBuffer> messageBufferList = new ArrayList<>();
 
     static {
-        for (int i = 0; i < 11000; i++) {
+        /*for (int i = 0; i < 11000; i++) {
             ClientMessageData.MessageBuffer messageBuffer = getMessageBuffer("topic1", i);
             messageBufferList.add(messageBuffer);
-        }
+        }*/
         /*ConcurrentHashMap<String,FileMsg> pp=new ConcurrentHashMap<>();
         try {
             File createFile = new File(fileReceivePath, "tmp_1kk.mp4");
@@ -127,7 +127,7 @@ public class MessageEncoderUtils {
     }
 
 
-    public static RemotingCommand MessageEncoderToRemotingCommand(CommonMessage message, RemotingCommand remotingRequest) throws Exception {
+    public static RemotingCommand MessageEncoderToRemotingCommand(CommonMessage message, RemotingCommand remotingRequest,int port, String topic) throws Exception {
         RemotingCommand remotingCommand = new RemotingCommand();
         //头信息
         CommonHeader.Common.Builder common = CommonHeader.Common.newBuilder();
@@ -145,16 +145,12 @@ public class MessageEncoderUtils {
                 ClientMessageData.TopicBrokerInfo.Builder topicBrokerInfo = ClientMessageData.TopicBrokerInfo.newBuilder();
                 topicBrokerInfo.setIpaddr(IpUtils.IpToInt("127.0.0.1"));
                 //topicBrokerInfo.setIpaddr6("0:0:0:0:0:0:0:1");
-                topicBrokerInfo.setPort(8080);
-                topicBrokerInfo.setTopicName("topic");
+                topicBrokerInfo.setPort(port);
+                topicBrokerInfo.setTopicName(topic);
                 topicBrokerInfo.setState(1);
                 if (producerId != null && !"".equals(producerId)) {
                     topicBrokerInfo.setProducerId(producerId);
                 }
-                if (count % 5 == 0) {
-                    //clientHeartbeatResponse.addMsgInfo(topicBrokerInfo);
-                }
-                count++;
                 clientHeartbeatResponse.setCommonHeader(common);
                 ClientMessageData.TLQClientHeartbeatResponse heartbeatResponse = clientHeartbeatResponse.build();
                 length = heartbeatResponse.toByteArray().length;
@@ -213,53 +209,30 @@ public class MessageEncoderUtils {
                     cbBrokerPushMsg.setConsumerID(pullMsg.getConsumerID());
                     cbBrokerPushMsg.setGroupName(pullMsg.getGroupName());
                     cbBrokerPushMsg.setTopic(pullMsg.getTopic());
+                    cbBrokerPushMsg.setDomain(pullMsg.getDomain());
                     cbBrokerPushMsg.setStatusCode(0);
-                    if (pullMsg.getConsumeQueOffset() == -1) {
-//                        if (sum <= 5) {
-//                            cbBrokerPushMsg.setMinConsumeQueueOffset(95);
-//                            cbBrokerPushMsg.setMaxConsumeQueueOffset(100);
-//                            //拉取最新消息
-//                            for (int m = 95; m <= 100; m++) {
-//                                ClientMessageData.MessageBuffer messageBuffer = messageBufferList.get(m - 1);
-//                                cbBrokerPushMsg.addMessages(messageBuffer);
-//                            }
-//                        }
-                        RemotingCommand msg = MessageDecoderUtils.msgQueue.poll();
-                        if (msg != null){
-                            System.out.println("添加消息。");
-                            msg.setOpaque(message.getRequestId());
-                            msg.setVerNo(message.getVerNo());
-                            cbBrokerPushMsg.addMessages(cmdToMessageBuffer(msg));
-                        }
+                    long minConsumeQueueOffset=0;
+                    long maxConsumeQueueOffset=0;
+                    /* consumeQueue 偏移量，-2：状态型（拉取最新消息）-1：使用服务端的消费历史记录 >=0:使用客户端传递的offset获取消息 */
+                    if (pullMsg.getConsumeQueOffset() == -2) {
+                        ClientMessageData.MessageBuffer messageBuffer = findMessageBuffer(pullMsg.getTopic(),pullMsg.getDomain(), -2);
+                        cbBrokerPushMsg.addMessages(messageBuffer);
+                        maxConsumeQueueOffset=messageBuffer.getMsgHeader().getCommitLogOffset();
                     } else if (pullMsg.getConsumeQueOffset() >= 0) {
-                        long end = 0;
-                        if (total >= 10) {
-                            messageSize = 11000;
-                            if (flag) {
-                                for (int i = 0; i < 10; i++) {
-                                    ClientMessageData.MessageBuffer messageBuffer = getMessageBuffer("topic1", i);
-                                    messageBufferList.add(messageBuffer);
-                                }
+                        //基于偏移量拉取消息
+                        int pullNum=pullMsg.getPullNum();
+                        minConsumeQueueOffset=pullMsg.getConsumeQueOffset();
+                        for(long i=pullMsg.getConsumeQueOffset();i<=pullNum;i++){
+                            ClientMessageData.MessageBuffer messageBuffer = findMessageBuffer(pullMsg.getTopic(),pullMsg.getDomain(), i);
+                            if(messageBuffer!=null){
+                                cbBrokerPushMsg.addMessages(messageBuffer);
+                                maxConsumeQueueOffset=messageBuffer.getMsgHeader().getCommitLogOffset();
                             }
-                            flag = false;
-                            total = 0;
-                        }
-                        if (pullMsg.getConsumeQueOffset() + pullMsg.getPullNum() >= messageSize) {
-                            end = messageSize;
-                            total++;
-                        } else {
-                            end = pullMsg.getConsumeQueOffset() + pullMsg.getPullNum();
-                        }
-                        cbBrokerPushMsg.setMinConsumeQueueOffset(pullMsg.getConsumeQueOffset());
-                        cbBrokerPushMsg.setMaxConsumeQueueOffset(end);
-                        for (long m = pullMsg.getConsumeQueOffset(); m < end; m++) {
-                            ClientMessageData.MessageBuffer messageBuffer = messageBufferList.get((int) (m));
-                            cbBrokerPushMsg.addMessages(messageBuffer);
                         }
                     }
-                    sum++;
+                    cbBrokerPushMsg.setMinConsumeQueueOffset(minConsumeQueueOffset);
+                    cbBrokerPushMsg.setMaxConsumeQueueOffset(maxConsumeQueueOffset);
                     ClientMessageData.CBBrokerPushMsg pushMsg = cbBrokerPushMsg.build();
-//                    System.out.println("pushMsg:"+pushMsg);
                     length = pushMsg.toByteArray().length;
                     body = pushMsg.toByteArray();
                 }
@@ -290,7 +263,6 @@ public class MessageEncoderUtils {
                 }
                 ClientMessageData.Client.Builder cbClient = ClientMessageData.Client.newBuilder();
                 cbClient.setCommonHeader(common);
-                //String clientId = UUID.randomUUID().toString();
                 cbClient.setClientId(clientRequest.getClientId());
                 cbClient.setStatusCode(0);
                 cbClient.setIdentifier(clientRequest.getIdentifier());
@@ -313,7 +285,7 @@ public class MessageEncoderUtils {
                 length = consumerAck.toByteArray().length;
                 body = consumerAck.toByteArray();
                 break;
-            case CB_REQUEST.CB_REQ_REGISTER_PRODUCER:
+            case CB_REQUEST.CB_REQ_REGISTER_PRODUCER://注册producer响应
                 common.setCommandType(CB_RESPONSE.CB_RSP_REGISTER_PRODUCER);
                 remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_REGISTER_PRODUCER);
                 ClientMessageData.CBRegisterProducer registerProducer = (ClientMessageData.CBRegisterProducer) remotingRequest.getMessage();
@@ -330,12 +302,9 @@ public class MessageEncoderUtils {
                 break;
             case CB_REQUEST.CB_SEND_REPLY_MESSAGE:
             case CB_REQUEST.CB_REQ_SEND_MESSAGE://发送消息响应
-                /*try {
-                    Thread.sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }*/
                 ClientMessageData.MessageBuffer sendMessage = (ClientMessageData.MessageBuffer) remotingRequest.getMessage();
+                //把消息添加到缓存中
+                messageBufferList.add(getMessageBuffer(sendMessage));
                 ClientMessageData.MessageHeader header = sendMessage.getMsgHeader();
                 ClientMessageData.PublicMsgHeader publicMsgHeader = header.getPubHeader();
                 common.setCommandType(CB_RESPONSE.CB_RSP_SEND_MESSAGE_ACK);
@@ -366,7 +335,7 @@ public class MessageEncoderUtils {
                 length = unRegisterConsumerAck1.toByteArray().length;
                 body = unRegisterConsumerAck1.toByteArray();
                 break;
-            case CB_REQUEST.CB_REQ_UNREGISTER_PRODUCER:
+            case CB_REQUEST.CB_REQ_UNREGISTER_PRODUCER://注销producer响应
                 common.setCommandType(CB_RESPONSE.CB_RSP_UNREGISTER_PRODUCER);
                 remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_UNREGISTER_PRODUCER);
                 ClientMessageData.CBUnRegisterProducer unRegisterProducer = (ClientMessageData.CBUnRegisterProducer) remotingRequest.getMessage();
@@ -389,7 +358,6 @@ public class MessageEncoderUtils {
 
                 ClientMessageData.TopicBrokerInfo.Builder topicInfo = ClientMessageData.TopicBrokerInfo.newBuilder();
                 topicInfo.setIpaddr(IpUtils.IpToInt("127.0.0.1"));
-                //topicInfo.setIpaddr(IpUtils.IpToInt("192.168.56.1"));
                 //topicInfo.setIpaddr6("0:0:0:0:0:0:0:1");
                 topicInfo.setPort(9999);
                 if (!Validators.isEmpty(routeRequest.getTopicName())) {
@@ -402,58 +370,12 @@ public class MessageEncoderUtils {
                 topicInfo.setProducerId(routeRequest.getProducerId());
                 producerId = routeRequest.getProducerId();
                 topicRouteResponse.addMsgInfo(topicInfo);
-
-                /*ClientMessageData.TopicBrokerInfo.Builder topicInfo1 = ClientMessageData.TopicBrokerInfo.newBuilder();
-                topicInfo1.setIpaddr(IpUtils.IpToInt("127.0.0.1"));
-                //topicInfo1.setIpaddr6("0:0:0:0:0:0:0:1");
-                topicInfo1.setPort(9090);
-                topicInfo1.setTopicName(routeRequest.getTopicName());
-                topicInfo1.setState(1);
-                topicInfo1.setProducerId(routeRequest.getProducerId());
-                topicRouteResponse.addMsgInfo(topicInfo1);*/
-
-                /*if(count<=10){
-                    ClientMessageData.TopicBrokerInfo.Builder topicInfo = ClientMessageData.TopicBrokerInfo.newBuilder();
-                    topicInfo.setIpaddr(IpUtils.IpToInt("47.104.138.62"));
-                    //topicInfo.setIpaddr6("0:0:0:0:0:0:0:1");
-                    topicInfo.setPort(8080);
-                    topicInfo.setTopicName(routeRequest.getTopicName());
-                    topicInfo.setState(1);
-                    topicInfo.setProducerId(routeRequest.getProducerId());
-                    producerId=routeRequest.getProducerId();
-                    topicRouteResponse.addMsgInfo(topicInfo);
-
-                    ClientMessageData.TopicBrokerInfo.Builder topicInfo1 = ClientMessageData.TopicBrokerInfo.newBuilder();
-                    topicInfo1.setIpaddr(IpUtils.IpToInt("127.0.0.1"));
-                    //topicInfo1.setIpaddr6("0:0:0:0:0:0:0:1");
-                    topicInfo1.setPort(9090);
-                    topicInfo1.setTopicName(routeRequest.getTopicName());
-                    topicInfo1.setState(1);
-                    topicInfo1.setProducerId(routeRequest.getProducerId());
-                    topicRouteResponse.addMsgInfo(topicInfo1);
-                }else {
-                    ClientMessageData.TopicBrokerInfo.Builder topicInfo = ClientMessageData.TopicBrokerInfo.newBuilder();
-                    topicInfo.setIpaddr(IpUtils.IpToInt("127.0.0.1"));
-                    //topicInfo.setIpaddr6("0:0:0:0:0:0:0:1");
-                    topicInfo.setPort(8080);
-                    topicInfo.setTopicName(routeRequest.getTopicName());
-                    topicInfo.setState(1);
-                    topicInfo.setProducerId(routeRequest.getProducerId());
-                    producerId=routeRequest.getProducerId();
-                    topicRouteResponse.addMsgInfo(topicInfo);
-                }*/
                 topicRouteResponse.setCommonHeader(common);
                 ClientMessageData.TLQTopicRouteResponse routeResponse = topicRouteResponse.build();
                 length = routeResponse.toByteArray().length;
                 body = routeResponse.toByteArray();
                 break;
             case CB_REQUEST.CB_REQ_BATCH_PUSH_MSG://批量发送消息请求
-                /*try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }*/
-                //int l=5/0;
                 ClientMessageData.CBClientBatchPushMsg batchPushMsgRequest = (ClientMessageData.CBClientBatchPushMsg) remotingRequest.getMessage();
                 common.setCommandType(CB_RESPONSE.CB_RSP_BATCH_PUSH_MSG_ACK);
                 remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_BATCH_PUSH_MSG_ACK);
@@ -703,28 +625,61 @@ public class MessageEncoderUtils {
         return arr;
     }
 
-    public static ClientMessageData.MessageBuffer getMessageBuffer(String topic, int i) {
-        ClientMessageData.MessageBuffer.Builder buffer = ClientMessageData.MessageBuffer.newBuilder();
-        buffer.setData(ByteString.copyFrom(("hello world-" + i).getBytes()));
-        Map<String, Object> map = new HashMap<>();
-        map.put("key", "yangping");
-        ClientMessageData.MessageAttr.Builder attr = ClientMessageData.MessageAttr.newBuilder();
-        attr.setAttrCount(1);
-        attr.setAttrData(ByteString.copyFrom(mapToBytes(map)));
-        buffer.setMsgAttr(attr);
-        buffer.setProducerID("producerId");
+    public static ClientMessageData.MessageBuffer findMessageBuffer(String topic, String domain,long offset) {
+        for(ClientMessageData.MessageBuffer messageBuffer:messageBufferList){
+            if(!Validators.isEmpty(domain) && !Validators.isEmpty(messageBuffer.getMsgHeader().getDomain())){
+                if(domain.equals(messageBuffer.getMsgHeader().getDomain()) && topic.equals(messageBuffer.getMsgHeader().getTopicName()) ){
+                    if(offset==-2){
+                        return messageBuffer;
+                    }else {
+                        if(offset==messageBuffer.getMsgHeader().getCommitLogOffset()){
+                            return messageBuffer;
+                        }
+                    }
+                }
+            }else {
+                if(Validators.isEmpty(domain)){
+                    if(topic.equals(messageBuffer.getMsgHeader().getTopicName())){
+                        if(offset==-2){
+                            return messageBuffer;
+                        }else {
+                            if(offset==messageBuffer.getMsgHeader().getCommitLogOffset()){
+                                return messageBuffer;
+                            }
+                        }
+                    }
+                }else {
+                    if(domain.equals(messageBuffer.getMsgHeader().getDomain()) && topic.equals(messageBuffer.getMsgHeader().getTopicName())){
+                        if(offset==-2){
+                            return messageBuffer;
+                        }else {
+                            if(offset==messageBuffer.getMsgHeader().getCommitLogOffset()){
+                                return messageBuffer;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
+    public static ClientMessageData.MessageBuffer getMessageBuffer( ClientMessageData.MessageBuffer sendMessage) {
+        ClientMessageData.MessageBuffer.Builder buffer = ClientMessageData.MessageBuffer.newBuilder();
+        buffer.setData(sendMessage.getData());
+        buffer.setMsgAttr(sendMessage.getMsgAttr());
+        buffer.setProducerID(sendMessage.getProducerID());
         ClientMessageData.MessageHeader.Builder header = ClientMessageData.MessageHeader.newBuilder();
         header.setConsumeQueueOffset(offset.getAndIncrement());
-        header.setTopicName(topic);
-        header.setMsgID(UUID.randomUUID().toString());
+        header.setTopicName(sendMessage.getMsgHeader().getTopicName());
+        header.setMsgID(sendMessage.getMsgHeader().getMsgID());
         header.setQueueID(0);
-        header.setExpiry(-1);
-        header.setPersistence(1);
-        header.setCluster("");
-        header.setDomain("");
+        header.setExpiry(sendMessage.getMsgHeader().getExpiry());
+        header.setPersistence(sendMessage.getMsgHeader().getPersistence());
+        header.setCluster("none");
+        header.setDomain(sendMessage.getMsgHeader().getDomain());
         header.setCommitLogOffset(requestId.getAndIncrement());
-        header.setBrokerId(100);
+        header.setBrokerId(1);
         int time = (int) (System.currentTimeMillis() / 1000);
         header.setTime(time);
         buffer.setMsgHeader(header);
