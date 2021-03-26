@@ -168,6 +168,15 @@ public class MessageEncoderUtils {
                     ClientMessageData.TLQClientBrokerHeartbeatResponse build = brokerHeart.build();
                     length = build.toByteArray().length;
                     body = build.toByteArray();
+                }else {
+                    common.setCommandType(CB_RESPONSE.CB_RSP_HEARTBEAT);
+                    remotingCommand.setCommandType(CB_RESPONSE.CB_RSP_HEARTBEAT);
+                    ClientMessageData.TLQClientBrokerHeartbeatResponse.Builder brokerHeart = ClientMessageData.TLQClientBrokerHeartbeatResponse.newBuilder();
+                    brokerHeart.setCommonHeader(common);
+                    brokerHeart.setClientId(clientHeartbeatRequest.getClientId());
+                    ClientMessageData.TLQClientBrokerHeartbeatResponse build = brokerHeart.build();
+                    length = build.toByteArray().length;
+                    body = build.toByteArray();
                 }
                 break;
             case CB_REQUEST.CB_REQ_PULL_MESSAGE://客户端拉取消息响应

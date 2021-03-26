@@ -54,7 +54,7 @@ public class MessageDecoderUtils {
                     ClientMessageData.CBClientConsumerPullMsg consumerPull = ClientMessageData.CBClientConsumerPullMsg.parseFrom(body);
                     object = consumerPull;
                     requestId = consumerPull.getCommonHeader().getRequestId();
-//                    System.out.println("收到客户端拉取消息请求:" + consumerPull);
+                    //System.out.println("收到客户端拉取消息请求:" + consumerPull);
 //                    System.out.println("消息缓存为:" + msgQueue.toString());
                     break;
                 case CN_REQUEST.CN_REQ_REGISTER_CLIENT://客户端名字服务注册请求
